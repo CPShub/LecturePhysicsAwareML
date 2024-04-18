@@ -28,6 +28,50 @@ MLP: custom trainable layer
 """
 
 class MLP(layers.Layer):
+    def __init__(self, units, activation):
+        super().__init__()
+        
+        self.ls = []
+        
+        for (u, a) in zip(units, activation):
+                
+            self.ls += [layers.Dense(u, a)]      
+
+         
+    def call(self, x):     
+        
+      
+        for l in self.ls:
+            x = l(x)
+        return x
+    
+
+
+# %%   
+"""
+main: construction of the NN model
+
+"""
+
+def main(**kwargs):
+    # define input shape
+    xs = tf.keras.Input(shape=[1])
+    # define which (custom) layers the model uses
+    ys = MLP(**kwargs)(xs)
+    # connect input and output
+    model = tf.keras.Model(inputs = [xs], outputs = [ys])
+    # define optimizer and loss function
+    model.compile('adam', 'mse')
+    return model
+
+
+# %%   
+"""
+MLP_con: custom trainable layer with possible non-negative weight constraints
+
+"""
+
+class MLP_con(layers.Layer):
     def __init__(self, units, activation, non_neg):
         super().__init__()
         
@@ -50,19 +94,20 @@ class MLP(layers.Layer):
         for l in self.ls:
             x = l(x)
         return x
+    
 
 
 # %%   
 """
-main: construction of the NN model
+main_con: construction of the NN model with possible non-negative weight constraints
 
 """
 
-def main(**kwargs):
+def main_con(**kwargs):
     # define input shape
     xs = tf.keras.Input(shape=[1])
     # define which (custom) layers the model uses
-    ys = MLP(**kwargs)(xs)
+    ys = MLP_con(**kwargs)(xs)
     # connect input and output
     model = tf.keras.Model(inputs = [xs], outputs = [ys])
     # define optimizer and loss function
