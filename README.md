@@ -13,7 +13,7 @@ Research group website: [link](https://www.maschinenbau.tu-darmstadt.de/cps/depa
 
 ## Description
 
-This repository offers a collection of lecture material and code examples based on the lecture "Physics-aware Machine Learning" by Prof. Dr. rer. nat Oliver Weeger. 
+This repository offers a collection of lecture materials and code examples accompanying the lecture "Physics-aware Machine Learning" at TU Darmstadt (module no. 16-73-4144). 
 
 ## Lecture material
 
