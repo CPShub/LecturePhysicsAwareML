@@ -17,4 +17,8 @@ This repository offers a collection of lecture material and code examples based 
 
 ## Lecture material
 
-* ...
+### Chapter 01: Introduction
+* 'FFNN_introduction': Demo of regression of simple functions with FFNNs
+
+### Chapter 02: Physics-based modeling & simulation
+* 'ode_examples': Numerical integration of ODEs in MATLAB
