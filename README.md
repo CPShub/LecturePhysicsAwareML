@@ -1,11 +1,9 @@
 # Lecture "Physics-aware Machine Learning"
 
-Lecturer: Prof. Dr. rer. nat. Oliver Weeger
+Lecturer: Prof. Oliver Weeger
 
-Content creators: 
-* Dr.-Ing. Maximilian Kannapin
-* Jasper O. Schommartz, M.Sc.
-* Dominik K. Klein, M.Sc.
+Assistants: Dr.-Ing. Maximilian Kannapin, Jasper O. Schommartz, Dominik K. Klein
+
 
 
 
