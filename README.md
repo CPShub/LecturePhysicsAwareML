@@ -22,3 +22,4 @@ This repository offers a collection of lecture materials and code examples accom
 
 ### Chapter 02: Physics-based modeling & simulation
 * 'ode_examples': Numerical integration of ODEs in MATLAB
+* 'nlebb': Finite element discretization and numerical integration of dynamic nonlinear Euler Bernoulli beam in MATLAB
