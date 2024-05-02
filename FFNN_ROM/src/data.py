@@ -50,7 +50,7 @@ def dirac(A, t0, t):
     ax.set_xlabel('Time (s)')
     ax.set_ylabel(f'Force (N)')
     ax.grid()
-    fig.suptitle('Diract excitation', fontsize=16,  y=.995)
+    fig.suptitle('Dirac excitation', fontsize=16,  y=.995)
     plt.tight_layout()
     plt.show()
 
