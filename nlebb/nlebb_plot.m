@@ -22,17 +22,21 @@ function plots = nlebb_plot(plots,XX,XE,U,UE,npe,derivs,it)
     if (isempty(plots))
         plots = figure;
         set(plots,'Color','white');
-        subplot(1,derivs+1,1);
+        subplot(1,derivs+2,1);
         title('Deformed beam');
         hold on;
         grid on;
+        subplot(1,derivs+2,2);
+        title("u (--), w (-)");
+        hold on;
+        grid on;
         if (derivs)
-            subplot(1,derivs+1,2);
+            subplot(1,derivs+2,3);
             title("u` (--), w` (-)");
             hold on;
             grid on;
             if (derivs > 1)
-                subplot(1,derivs+1,3);
+                subplot(1,derivs+2,4);
                 title("u`` (--), w`` (-)");
                 hold on;
                 grid on;
@@ -42,7 +46,7 @@ function plots = nlebb_plot(plots,XX,XE,U,UE,npe,derivs,it)
     
     % Evaluate with loop over elements
     pUWx = zeros(npe*ne, 1);
-    pUW0 = zeros(npe*ne, 2);
+    pUW0 = zeros(npe*ne, 3);
     pUW1 = zeros(npe*ne, 2);
     pUW2 = zeros(npe*ne, 2);
 
@@ -57,8 +61,9 @@ function plots = nlebb_plot(plots,XX,XE,U,UE,npe,derivs,it)
             x = Xel(1) + Xi * (Xel(2)-Xel(1));
             H0 = [1-3*Xi^2+2*Xi^3, Xi-2*Xi^2+Xi^3, 3*Xi^2-2*Xi^3, -Xi^2+Xi^3];  
             pUWx((el-1)*npe+ii, 1) = x;
-            pUW0((el-1)*npe+ii, 1) = x + dot(H0, UWe(1,:));
+            pUW0((el-1)*npe+ii, 1) = dot(H0, UWe(1,:));
             pUW0((el-1)*npe+ii, 2) = dot(H0, UWe(2,:));
+            pUW0((el-1)*npe+ii, 3) = x + dot(H0, UWe(1,:));
             if (derivs)
                 J = abs(Xel(2)-Xel(1));
                 H1 = [-6*Xi+6*Xi^2, 1-4*Xi+3*Xi^2, 6*Xi-6*Xi^2, -2*Xi+3*Xi^2] / J;
@@ -75,8 +80,12 @@ function plots = nlebb_plot(plots,XX,XE,U,UE,npe,derivs,it)
     end
 
     % Plot
-    plot(plots.Children(derivs+1), pUW0(:,1),pUW0(:,2),...
+    plot(plots.Children(derivs+2), pUW0(:,3),pUW0(:,2),...
         'Color',cmap(col,:),'Displayname',sprintf('it=%i',it));
+    plot(plots.Children(derivs+1), pUWx(:,1),pUW0(:,1),'--',...
+        'Color',cmap(col,:),'Displayname',sprintf('u, it=%i',it));
+    plot(plots.Children(derivs+1), pUWx(:,1),pUW0(:,2),...
+        'Color',cmap(col,:),'Displayname',sprintf('w, it=%i',it));
     if (derivs)
         plot(plots.Children(derivs), pUWx(:,1),pUW1(:,1),'--',...
             'Color',cmap(col,:),'Displayname',sprintf('u`, it=%i',it));

@@ -30,7 +30,7 @@ BC1 = 0;            % x=L
 
 % Axial & transversal line load [N/m]
 load_f = 0;
-load_q = -9.81*RA;
+load_q = 0; %-9.81*RA;
 load = @(x) [load_f, load_q];               
 
 % Point forces at points [1,2,3,4]*L/4 [N]
@@ -39,7 +39,7 @@ Qz = [0 0 0 20];
 My = 0; %-2;                % Moment at x=L [Nm]
 
 % Number of finite elements
-ne = 4*4;       
+ne = 4*2;       
 
 % Newton-Raphson parameters
 rnMax = 20;     % Max. no. of iterations
@@ -133,6 +133,9 @@ fprintf('Solution:   Wint=%5.3e, Wext=%5.3e, dW=%5.3e\n', ...
 wana = @(x)  1/EI/24 * x.^2 .* (Qz(4)*4*(3*L - x) + load_q*(6*L^2 - 4*L*x + x.^2) - My*12);
 wana1 = @(x) 1/EI/6 * x .* (Qz(4)*3*(2*L - x) + load_q*(3*L^2 - 3*L*x + x.^2) - My*6);
 wana2 = @(x) 1/EI/2 * (Qz(4)*2*(L - x) + load_q*(L^2 - 2*L*x + x.^2) - My*2);
+uana0 = @(x) -(Qz(4)/EI)^2 / 8 * x.^3 .* (4/3*L^2 - L*x + 1/5*x.^2);
+uana1 = @(x) -(Qz(4)/EI)^2 / 8 * x.^2 .* (2*L-x).^2;
+uana2 = @(x) -(Qz(4)/EI)^2 / 2 * x .* (L-x).*(2*L-x);
 
 [qp,qw] = gauss1d(7,0,L);
 Wextana = sum(load_q * wana(qp) .* qw) + Qz(4)*wana(L) - My*wana1(L);
@@ -143,9 +146,12 @@ fprintf('Analytical: Wint=%5.3e, Wext=%5.3e, dW=%5.3e\n', ...
     Wintana, Wextana, dWana);
 
 xxx = 0:(0.01*L):L;
-plot(nlebbplots.Children(3), xxx, wana(xxx));
-plot(nlebbplots.Children(2), xxx, wana1(xxx));
-plot(nlebbplots.Children(1), xxx, wana2(xxx));
+plot(nlebbplots.Children(3), xxx, wana(xxx), 'Displayname', 'w ana.');
+plot(nlebbplots.Children(3), xxx, uana0(xxx), '--', 'Displayname', 'u ana.');
+plot(nlebbplots.Children(2), xxx, wana1(xxx), 'Displayname', 'w` ana.');
+plot(nlebbplots.Children(2), xxx, uana1(xxx), '--', 'Displayname', 'u` ana.');
+plot(nlebbplots.Children(1), xxx, wana2(xxx), 'Displayname', 'w`` ana.');
+plot(nlebbplots.Children(1), xxx, uana2(xxx), '--', 'Displayname', 'u`` ana.');
 
 return
 
