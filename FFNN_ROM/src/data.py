@@ -16,19 +16,33 @@ from matplotlib import pyplot as plt
 
 fpath = lambda x, y: join(dirname(realpath('__file__')), 'data', x, y)
 
-def read_data(dir_name, fnames_x, fnames_y, fnames_dy):
+def read_data(dir_path, fnames_x, fnames_y, fnames_dy):
     ''' Auxiliary function for loading data from .txt files '''
     x_list = []
     y_list = []
     dy_list = []
     for fx, fy, fdy in zip(fnames_x, fnames_y, fnames_dy):
-        x_list.append(pd.read_csv(fpath(dir_name, fx), sep=',', header=None).to_numpy().transpose()[1:, :])
-        y_list.append(pd.read_csv(fpath(dir_name, fy), sep=',', header=None).to_numpy().transpose()[1:, :])
-        dy_list.append(pd.read_csv(fpath(dir_name, fdy), sep=',', header=None).to_numpy().transpose()[1:, :])
+        x_list.append(pd.read_csv(join(dir_path, fx), sep=',', header=None).to_numpy().transpose()[1:, :])
+        y_list.append(pd.read_csv(join(dir_path, fy), sep=',', header=None).to_numpy().transpose()[1:, :])
+        dy_list.append(pd.read_csv(join(dir_path, fdy), sep=',', header=None).to_numpy().transpose()[1:, :])
     x = np.vstack(x_list)
     y = np.vstack(y_list)
     dy = np.vstack(dy_list)
     return x, y, dy
+
+# def read_data(dir_name, fnames_x, fnames_y, fnames_dy):
+#     ''' Auxiliary function for loading data from .txt files '''
+#     x_list = []
+#     y_list = []
+#     dy_list = []
+#     for fx, fy, fdy in zip(fnames_x, fnames_y, fnames_dy):
+#         x_list.append(pd.read_csv(fpath(dir_name, fx), sep=',', header=None).to_numpy().transpose()[1:, :])
+#         y_list.append(pd.read_csv(fpath(dir_name, fy), sep=',', header=None).to_numpy().transpose()[1:, :])
+#         dy_list.append(pd.read_csv(fpath(dir_name, fdy), sep=',', header=None).to_numpy().transpose()[1:, :])
+#     x = np.vstack(x_list)
+#     y = np.vstack(y_list)
+#     dy = np.vstack(dy_list)
+#     return x, y, dy
 
 def static(A, t):
     y = A * t / 5
