@@ -14,8 +14,6 @@ function [w, b] = read_weights(units,fname)
     % reshape weights
     for i=1:length(w)
         w{i} = reshape(w{i}, units(i), []);
-        % w{i} = reshape(w{i}, [], units(i))';
-        % w{i} = reshape(w{i}, units(i), [])';
     end
 end
 
