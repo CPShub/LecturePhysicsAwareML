@@ -18,7 +18,7 @@ qm = 4;             % Number of modes for projection
 qdeim = 0; % 12;    % Use DEIM for f with ... modes
 
 % Neural network-based approximation
-qnn = 0;            % 0: Off, 1: On
+qnn = 0;            % 0: Off, 1: No energy, 2: Energy
 fnw = 'weights.txt';
 
 % Axial & transversal line load [N/m]
@@ -27,17 +27,17 @@ load_q = 0; % -0.981*RA*0.1;
 load = @(x,t) [load_f, load_q];    
 
 % Point forces at points [1,2,3,4]*L/4 [N]
-tPer = .1;                  % Vibration period [s]
+tPer = .01;                  % Vibration period [s]
 Nx = @(t) [0 0 0 0];
-Qz = @(t) [0 0 0 -1*sin(2*pi/tPer*t)];  
+%Qz = @(t) [0 0 0 -1*sin(2*pi/tPer*t)];  
 % Qz = @(t) [0 0 0 -10*(1+t)*sin(2*pi/tPer*t)];
 % Qz = @(t) [0 0 0 multiphase_multisin(2,0.085,100,1,3,t)]; % Multisine train 1
 % Qz = @(t) [0 0 0 multiphase_multisin(2,0.085,100,2,3,t)]; % Multisine train 2
 % Qz = @(t) [0 0 0 multiphase_multisin(2,0.085,100,3,3,t)]; % Multisine train 3
 % Qz = @(t) [0 0 0 multiphase_multisin(1,0.103,78,1,1,t)];  % Multisine test 1
 % Qz = @(t) [0 0 0 1.5*sin(2*pi*6*t)];                      % Sine test
-% Qz = @(t) [0 0 0 -10*(t>2.5)];                            % Step test
-% Qz = @(t) [0 0 0 -10*(t>2.5)*(t<2.51)];                   % Dirac test
+% Qz = @(t) [0 0 0 -10*(t>.2)];                            % Step test
+% Qz = @(t) [0 0 0 -10*(t>.5)*(t<.51)];                   % Dirac test
 % Qz = @(t) [0 0 0 -2*t];                                   % Quasi static
 My = @(t) 0;                % Moment at x=L [Nm]
 
@@ -191,8 +191,13 @@ if (qdeim)
 end
 
 % Use NN for f
-if (qnn)
+if (qnn==1)
     units = [16 16 16 16 qm]; % Number of nodes in hidden and output layers
+    activations = {@softplus @softplus @softplus @softplus @linear};
+    [Wnn,bnn] = read_weights(units,fnw);
+elseif (qnn==2)
+    units = [16 16 1]; % Number of nodes in hidden and output layers
+    activations = {@softplus @softplus @linear};
     [Wnn,bnn] = read_weights(units,fnw);
 end
 
@@ -297,11 +302,18 @@ while (t < tend)
             % Note: An efficient assembly for DEIM should only sample the
             %       required rows of fi(F0P)! Assembling the whole f is
             %       completely inefficient and only done here for demo.
-        elseif (qnn)
-            [Qf,QKQ] = mlp(Wnn,bnn,q0);
+        elseif (qnn==1)
+            [Qf,QKQ] = mlp(Wnn,bnn,activations,q0);
             % Note: An efficient use of the neural network would mean
-            %       disabling the assembly if f and K, which was not done
-            %       here ito make less intrusive changes to the code.
+            %       disabling the assembly of f and K, which was not done
+            %       here to the changes less intrusive to the code.
+        elseif (qnn==2)
+            [~,Qf,QKQ] = mlp(Wnn,bnn,activations,q0);
+            Qf = Qf';
+            QKQ = reshape(QKQ,qm,qm);
+            % Note: An efficient use of the neural network would mean
+            %       disabling the assembly of f and K, which was not done
+            %       here to the changes less intrusive to the code.
         else
             Qf = Q'*fi;
             QKQ = Q'*Kii*Q;
@@ -439,6 +451,38 @@ if (plotMovieSteps > 0)
         open(vwriter);
         writeVideo(vwriter,frames);
         close(vwriter);
+    end
+end
+
+% -------------------------------------------------------------------------
+% --- NEURAL NETWORK ACTIVATION FUNCTIONS
+function [y,dy,ddy] = softplus(x)
+    y = softplus(x);
+    if nargout > 1
+        dy = sigmoid(x);
+        if nargout > 2
+            ddy = dsigmoid(dy);
+        end
+    end
+    
+    function y = softplus(x)
+        y = log(1 + exp(x));
+    end
+    function y = sigmoid(x)
+        y = 1 ./ (1 + exp(-x));
+    end
+    function y = dsigmoid(x)
+        y = x.*(1 - x);
+    end
+end
+
+function [y,dy,ddy] = linear(x)
+    y = x;
+    if nargout > 1
+        dy = x./x;
+        if nargout > 2
+            ddy = x * 0;
+        end
     end
 end
 
