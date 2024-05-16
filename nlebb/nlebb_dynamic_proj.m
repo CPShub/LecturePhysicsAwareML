@@ -19,7 +19,7 @@ qdeim = 0; % 12;    % Use DEIM for f with ... modes
 
 % Neural network-based approximation
 qnn = 0;            % 0: Off, 1: On
-fnw = 'weights.txt';
+fnw = 'weights_01_1_5e-7.txt';
 
 % Axial & transversal line load [N/m]
 load_f = 0;
@@ -27,9 +27,9 @@ load_q = 0; % -0.981*RA*0.1;
 load = @(x,t) [load_f, load_q];    
 
 % Point forces at points [1,2,3,4]*L/4 [N]
-tPer = .1;                  % Vibration period [s]
+tPer = 1.;                  % Vibration period [s]
 Nx = @(t) [0 0 0 0];
-Qz = @(t) [0 0 0 -1*sin(2*pi/tPer*t)];  
+Qz = @(t) [0 0 0 -10*sin(2*pi/tPer*t)];  
 % Qz = @(t) [0 0 0 -10*(1+t)*sin(2*pi/tPer*t)];
 % Qz = @(t) [0 0 0 multiphase_multisin(2,0.085,100,1,3,t)]; % Multisine train 1
 % Qz = @(t) [0 0 0 multiphase_multisin(2,0.085,100,2,3,t)]; % Multisine train 2
@@ -87,7 +87,7 @@ BC1 = 0;            % x=L
 %-- input
 
 % Time discretization parameters
-tend = 50*tPer;              % End time
+tend = 5*tPer;              % End time
 stepsPer = 8 * 20 * 2;          % Time steps per period
 dt = tPer/stepsPer;         % Time step size
 twrite = stepsPer / 16;     % Write to command line every ... time steps
@@ -109,6 +109,8 @@ eps = 1e-5;     % Tolerance for errors
 % Newmark parameters
 gamma = 0.6;        
 beta = gamma / 2.; 
+
+plotModes = 1;
 
 % -------------------------------------------------------------------------
 % --- DATA PREPARATION
@@ -171,6 +173,17 @@ if (size(loadQ,1) ~= Ni)
     end
 end
 Q = loadQ(:,1:qm);
+
+% Plot modes
+if (qmode && plotModes)
+    u = zeros(N,1);
+    nlebbplots = nlebb_plot([],XX,XE,u,UE,5,0,i);
+    for i = 1:qm
+        u(dofs_i) = Q(:,i);
+        nlebbplots = nlebb_plot(nlebbplots,XX,XE,u,UE,5,0,i+1);
+    end 
+end
+
 
 % Use DEIM for f
 if (qdeim)
@@ -405,6 +418,15 @@ if (plotEnergy)
     plot(tt, Wall(2,:), 'Displayname', 'Internal energy');
     plot(tt, Wall(3,:), 'Displayname', 'External work');
     legend;
+end
+
+% Plot mode amplitudes
+if (plotModes)
+    figure; hold on;
+    title('Mode amplitudes q_i');
+    for i = 1:qm
+        plot(tt, q0all(i,:), 'Displayname', sprintf('q_%i', i));
+    end
 end
 
 % Create, show (and save) movie
