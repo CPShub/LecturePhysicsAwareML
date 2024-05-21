@@ -65,6 +65,7 @@ def main(**kwargs):
     return model
 
 
+
 # %%   
 """
 MLP_con: custom trainable layer with possible non-negative weight constraints
@@ -85,7 +86,8 @@ class MLP_con(layers.Layer):
             else:
                 kernel_constraint = None
                 
-            self.ls += [layers.Dense(u, a, kernel_constraint=kernel_constraint)]      
+            self.ls += [layers.Dense(u, a, \
+                                     kernel_constraint=kernel_constraint)]      
 
          
     def call(self, x):     
@@ -99,7 +101,8 @@ class MLP_con(layers.Layer):
 
 # %%   
 """
-main_con: construction of the NN model with possible non-negative weight constraints
+main_con: construction of the NN model with possible non-negative weight 
+          constraints
 
 """
 
@@ -112,4 +115,46 @@ def main_con(**kwargs):
     model = tf.keras.Model(inputs = [xs], outputs = [ys])
     # define optimizer and loss function
     model.compile('adam', 'mse')
+    return model
+
+
+
+# %%   
+"""
+MLP_con_grad: custom trainable layer with possible non-negative weight 
+              constraints and possibility of Sobolev training
+
+"""
+
+class MLP_grad(layers.Layer):
+    def __init__(self, **kwargs):
+        super().__init__()
+        self.MLP = MLP_con(**kwargs)
+        
+    def call(self, x):     
+        
+        with tf.GradientTape() as tape:
+            tape.watch(x)
+            y = self.MLP(x)
+            
+        dy = tape.gradient(y, x)
+        
+        return y, dy
+
+
+# %%   
+"""
+main_con: construction of the NN model with possible non-negative weight constraints
+
+"""
+
+def main_con_grad(loss_weights=[1, 1], **kwargs):
+    # define input shape
+    xs = tf.keras.Input(shape=[1])
+    # define which (custom) layers the model uses
+    ys, dys = MLP_grad(**kwargs)(xs)
+    # connect input and output
+    model = tf.keras.Model(inputs = [xs], outputs = [ys, dys])
+    # define optimizer and loss function
+    model.compile('adam', 'mse', loss_weights=loss_weights)
     return model
