@@ -27,7 +27,7 @@ load_q = 0; % -0.981*RA*0.1;
 load = @(x,t) [load_f, load_q];    
 
 % Point forces at points [1,2,3,4]*L/4 [N]
-tPer = .01;                  % Vibration period [s]
+tPer = .1;                  % Vibration period [s]
 Nx = @(t) [0 0 0 0];
 Qz = @(t) [0 0 0 -10*sin(2*pi/tPer*t)];  
 % Qz = @(t) [0 0 0 -10*(1+t)*sin(2*pi/tPer*t)];
@@ -109,7 +109,7 @@ eps = 1e-5;     % Tolerance for errors
 gamma = 0.6;        
 beta = gamma / 2.; 
 
-plotModes = 1;
+plotModes = 0;
 
 % -------------------------------------------------------------------------
 % --- DATA PREPARATION
