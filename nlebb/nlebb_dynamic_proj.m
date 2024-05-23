@@ -19,7 +19,7 @@ qdeim = 0; % 12;    % Use DEIM for f with ... modes
 
 % Neural network-based approximation
 qnn = 0;            % 0: Off, 1: No energy, 2: Energy
-fnw = 'weights.txt';
+fnw = fullfile('..', 'FFNN_ROM', 'data', 'weights.txt');
 
 % Axial & transversal line load [N/m]
 load_f = 0;
@@ -29,7 +29,7 @@ load = @(x,t) [load_f, load_q];
 % Point forces at points [1,2,3,4]*L/4 [N]
 tPer = .01;                  % Vibration period [s]
 Nx = @(t) [0 0 0 0];
-%Qz = @(t) [0 0 0 -1*sin(2*pi/tPer*t)];  
+Qz = @(t) [0 0 0 -1*sin(2*pi/tPer*t)];  
 % Qz = @(t) [0 0 0 -10*(1+t)*sin(2*pi/tPer*t)];
 % Qz = @(t) [0 0 0 multiphase_multisin(2,0.085,100,1,3,t)]; % Multisine train 1
 % Qz = @(t) [0 0 0 multiphase_multisin(2,0.085,100,2,3,t)]; % Multisine train 2
@@ -46,7 +46,6 @@ My = @(t) 0;                % Moment at x=L [Nm]
 % --- CALL FUNCTION FOR DATA GENERATION (BEAM SIMULATION)
 
 [q0all, Qfall, QKQall] = nlebb_dynamic_fun(load, Nx, Qz, My, tPer, qmode, qm, qdeim, qnn, fnw);
-
 
 % -------------------------------------------------------------------------
 % --- SAVE REDUCED DOFS AND INTERNAL FORCE VECTORS
