@@ -33,15 +33,15 @@ BC1 = 0;            % x=L
 load = @(x,t) [0, 0];  
 
 % Point forces at points [1,2,3,4]*L/4 [N]
-tPer = 10;           % Vibration period [s]
+tPer = 1;           % Vibration period [s]
 Fp = @(t) [0 0 0 0, ...     % x-dir.
-           0 0 0 2*t];      % z-dir.
+           0 0 0 -1*sin(2*pi/tPer*t)  ];      % z-dir.
 %Fp = @(t) [0 0 0 0, ...                     % x-dir.
 %           0 0 0 -10*sin(2*pi/tPer*t)];     % z-dir.
 My = @(t) 0;                 % Moment at x=L
 
 % Time discretization parameters
-tend = 3*tPer;              % End time
+tend = 5*tPer;              % End time
 stepsPer = 8 * 40;          % Time steps per period
 dt = tPer/stepsPer;         % Time step size
 twrite = stepsPer / 16;     % Write to command line every ... time steps
