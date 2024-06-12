@@ -2,7 +2,7 @@
 
 Lecturer: Prof. Oliver Weeger
 
-Assistants: Dr.-Ing. Maximilian Kannapin, Jasper O. Schommartz, Dominik K. Klein
+Assistants: Dr.-Ing. Maximilian Kannapinn, Jasper O. Schommartz, Dominik K. Klein
 
 
 
@@ -23,3 +23,7 @@ This repository offers a collection of lecture materials and code examples accom
 ### Chapter 02: Physics-based modeling & simulation
 * 'ode_examples': Numerical integration of ODEs in MATLAB
 * 'nlebb': Finite element discretization and numerical integration of dynamic nonlinear Euler Bernoulli beam in MATLAB
+
+### Chapter 06: PAML for dynamic systems
+* 'nlebb_dynamic_batch': Automated data generation with the non-linear Euler Bernoulli beam in MATLAB
+* 'NeuralODE': Demo of augmented neural ODEs in JAX
