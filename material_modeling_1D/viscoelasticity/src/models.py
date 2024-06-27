@@ -128,11 +128,18 @@ class GSMCell(layers.Layer):
 
 def build(m_type, params, **kwargs):
     ''' Build the model. '''
-    eps = tf.keras.Input(shape=[None, 1])
-    hs = tf.keras.Input(shape=[None, 1])
+    # eps = tf.keras.Input(shape=[None, 1])
+    # hs = tf.keras.Input(shape=[None, 1])
+    eps = tf.keras.Input(shape=(1,))
+    hs = tf.keras.Input(shape=(1,))
+
+    print(eps)
+    print(hs)
         
     cell = make_layer(m_type, params, **kwargs)
+    print(cell)
     rnn = layers.RNN(cell, return_sequences=True, return_state=False)
+    print(rnn)
     sigs = rnn((eps, hs))
 
     model = tf.keras.Model([eps, hs], [sigs])
