@@ -17,3 +17,4 @@ class Config:
     learning_rate: float
     batch_size: int
     weights: dict[str, float]
+    non_dim: bool

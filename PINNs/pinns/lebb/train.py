@@ -9,7 +9,7 @@ import optax
 from .config import Config
 from .utils import dataloader
 
-def train(model, x, y, config: Config):
+def train(model, x, config: Config):
 
     @partial(jax.jit, static_argnums=1)
     @jax.value_and_grad
@@ -29,10 +29,10 @@ def train(model, x, y, config: Config):
     optim = optax.adam(config.learning_rate)
     opt_state = optim.init(params)
 
-    iter_data = dataloader((x, y), config.batch_size)
+    iter_data = dataloader((x, x), config.batch_size)
 
     loss = None
-    for step, (x, y) in zip(range(config.steps), iter_data):
+    for step, (x, _) in zip(range(config.steps), iter_data):
         loss, params, opt_state = make_step(params, static, config.weights, x, opt_state)
         loss = loss.item()
         if step % 1000 == 0:
