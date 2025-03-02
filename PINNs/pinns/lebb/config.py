@@ -10,7 +10,7 @@ class Config:
     EI: float
     L: float
     F: float
-    q: float
+    q0: float
     bc_case: int
     dataset_size: int
     steps: int
