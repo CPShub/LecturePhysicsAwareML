@@ -7,7 +7,7 @@ import paramax
 import optax 
 
 from .config import Config
-from .utils import dataloader
+from ..utils import dataloader
 
 def train(model, x, config: Config):
 
