@@ -29,7 +29,7 @@ def train(model, x, config: Config):
     optim = optax.adam(config.learning_rate)
     opt_state = optim.init(params)
 
-    iter_data = dataloader((x, x), config.batch_size)
+    iter_data = dataloader((x, x), config.batch_size) # TODO: This is ugly. Fix the data loader
 
     loss = None
     for step, (x, _) in zip(range(config.steps), iter_data):

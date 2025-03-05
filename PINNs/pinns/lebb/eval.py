@@ -26,20 +26,20 @@ def model_fn(model, x: Array) -> Array:
 def evaluate(model, x, y):
     err = compute_mse(model, x, y)
 
-    w, w_x, w_xx, w_xxx, w_xxxx = y
+    w, w_x, M, Q, w_xxxx = y
 
     print("\nEvaluation:\n-----------")
     print(f"  MSE w:     {err[0]}")
     print(f"  MSE w':    {err[1]}")
-    print(f"  MSE w'':   {err[2]}")
-    print(f"  MSE w''':  {err[3]}")
+    print(f"  MSE M:     {err[2]}")
+    print(f"  MSE Q:     {err[3]}")
     print(f"  MSE w'''': {err[4]}")
 
     pred = model_fn(model, x)
 
-    w_pred, w_x_pred, w_xx_pred, w_xxx_pred, w_xxxx_pred = pred
+    w_pred, w_x_pred, M_pred, Q_pred, w_xxxx_pred = pred
 
-    fig, axs = plt.subplots(3, 2, figsize=(10, 12))
+    _, axs = plt.subplots(3, 2, figsize=(10, 12))
     axs[0, 0].plot(x, w_pred, 'r', label='PINN')
     axs[0, 0].plot(x, w, 'b', linestyle='--', label='analytical')
     axs[0, 0].set_xlabel(r'$x$')
@@ -54,17 +54,17 @@ def evaluate(model, x, y):
     axs[0, 1].grid()
     axs[0, 1].legend()
 
-    axs[1, 0].plot(x, w_xx_pred, 'r', label='PINN')
-    axs[1, 0].plot(x, w_xx, 'b', linestyle='--', label='analytical')
+    axs[1, 0].plot(x, M_pred, 'r', label='PINN')
+    axs[1, 0].plot(x, M, 'b', linestyle='--', label='analytical')
     axs[1, 0].set_xlabel(r'$x$')
-    axs[1, 0].set_ylabel(r'$\partial_{xx}w$')
+    axs[1, 0].set_ylabel(r'$M$')
     axs[1, 0].grid()
     axs[1, 0].legend()
 
-    axs[1, 1].plot(x, w_xxx_pred, 'r', label='PINN')
-    axs[1, 1].plot(x, w_xxx, 'b', linestyle='--', label='analytical')
+    axs[1, 1].plot(x, Q_pred, 'r', label='PINN')
+    axs[1, 1].plot(x, Q, 'b', linestyle='--', label='analytical')
     axs[1, 1].set_xlabel(r'$x$')
-    axs[1, 1].set_ylabel(r'$\partial_{xxx}w$')
+    axs[1, 1].set_ylabel(r'$Q$')
     axs[1, 1].grid()
     axs[1, 1].legend()
 
