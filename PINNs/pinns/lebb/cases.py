@@ -24,8 +24,8 @@ def bc_case_0(
     """Analytical solution for a cantilever beam with point load at the tip."""
     w = (0.5 * F * L * x**2 - 1. / 6. * F * x**3) / EI
     w_x = (F * L * x - 0.5 * F * x**2) / EI
-    M = - F * (L - x) / EI
-    Q = F * jnp.ones_like(x) / EI
+    M = - F * (L - x)
+    Q = F * jnp.ones_like(x)
     w_xxxx = jnp.zeros_like(x)
 
     return w, w_x, M, Q, w_xxxx
@@ -48,8 +48,8 @@ def bc_case_1(
     xL = x / L
     w = (xL**4 - 2 * xL**3 + xL) * q * L**4 / 24 / EI
     w_x = (4 * xL**3 - 6 * xL**2 + 1) * q * L**3 / 24 / EI
-    M = - (xL**2 - xL) * q * L**2 / 2 / EI
-    Q = - (2 * xL - 1) * q * L / 2 / EI
+    M = - (xL**2 - xL) * q * L**2 / 2
+    Q = - (2 * xL - 1) * q * L / 2
     w_xxxx = q / EI * jnp.ones_like(x)
 
     return w, w_x, M, Q, w_xxxx

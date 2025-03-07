@@ -36,14 +36,14 @@ def get_data_decorator(bc_func: Callable[[Config], dict[str, Array]]):
             x = x / x0
             w = w / w0
             w_x = w_x / w0 * x0
-            M = M / w0 * x0**2
-            Q = Q / w0 * x0**3
+            M = M / q0 / x0**2
+            Q = Q / q0 / x0
             w_xxxx = w_xxxx / w0 * x0**4
 
             bc_coords = ["w_bc_coords", "w_x_bc_coords", "M_bc_coords", "Q_bc_coords"]
             bc_values = ["w_bc_values", "w_x_bc_values", "M_bc_values", "Q_bc_values"]
             factors = [x0, x0, x0, x0]
-            value_factors = [w0, w0 / x0, w0 / x0**2, w0 / x0**3]
+            value_factors = [w0, w0 / x0, q0 * x0**2, q0 * x0]
 
             for coord, factor in zip(bc_coords, factors):
                 if bc[coord] is not None:
