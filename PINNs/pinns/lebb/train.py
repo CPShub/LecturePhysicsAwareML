@@ -16,7 +16,7 @@ def train(model, x, config: Config):
     def compute_loss(params, static, weights, x):
         model = eqx.combine(params, static)
         model = paramax.unwrap(model)
-        return model.loss(model, weights, x)
+        return model.loss(weights, x)
 
     @partial(jax.jit, static_argnums=1)
     def make_step(params, static, weights, x, opt_state):

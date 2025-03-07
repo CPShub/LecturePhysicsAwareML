@@ -79,11 +79,11 @@ class PINN(eqx.Module):
             self.Q_bc_values = paramax.NonTrainable(bc["Q_bc_values"].reshape(-1, 1))
 
     def __call__(self, x: Array) -> Array:
-        w = self.w(self, x)
-        w_x = self.w_x(self, x)
-        M = self.M(self, x)
-        Q = self.Q(self, x)
-        w_xxxx = self.w_xxxx(self, x)
+        w = self.w(x)
+        w_x = self.w_x(x)
+        M = self.M(x)
+        Q = self.Q(x)
+        w_xxxx = self.w_xxxx(x)
 
         return w, w_x, M, Q, w_xxxx
 
@@ -91,29 +91,29 @@ class PINN(eqx.Module):
         x = x / self.L
         return self.nn(x)
 
-    def w(self, model: Self, x: Array) -> Array:
-        return model.forward(x)
+    def w(self, x: Array) -> Array:
+        return self.forward(x)
 
-    def w_x(self, model: Self,  x: Array) -> Array:
-        return jax.jacfwd(self.w, argnums=1)(model, x)[0]
+    def w_x(self, x: Array) -> Array:
+        return jax.jacfwd(self.w)(x)[0]
 
-    def w_xx(self, model: Self, x: Array) -> Array:
-        return jax.jacfwd(self.w_x, argnums=1)(model, x)[0]
+    def w_xx(self, x: Array) -> Array:
+        return jax.jacfwd(self.w_x)(x)[0]
 
-    def M(self, model: Self, x: Array) -> Array:
-        return - self.EI * self.w_xx(model, x)
+    def M(self, x: Array) -> Array:
+        return - self.EI * self.w_xx(x)
 
-    def w_xxx(self, model: Self, x: Array) -> Array:
-        return jax.jacfwd(self.w_xx, argnums=1)(model, x)[0]
+    def w_xxx(self, x: Array) -> Array:
+        return jax.jacfwd(self.w_xx)(x)[0]
 
-    def Q(self, model: Self, x: Array) -> Array:
-        return - self.EI * self.w_xxx(model, x) 
+    def Q(self, x: Array) -> Array:
+        return - self.EI * self.w_xxx(x) 
 
-    def w_xxxx(self, model: Self, x: Array) -> Array:
-        return jax.jacfwd(self.w_xxx, argnums=1)(model, x)[0]
+    def w_xxxx(self, x: Array) -> Array:
+        return jax.jacfwd(self.w_xxx)(x)[0]
 
-    def res_w(self, model: Self, x: Array):
-        w_xxxx = self.w_xxxx(model, x)
+    def res_w(self, x: Array):
+        w_xxxx = self.w_xxxx(x)
         # The following line defines the residual for a constant line load.
         # To change that in the future, the right hand side of this equation
         # must be modified.
@@ -121,39 +121,39 @@ class PINN(eqx.Module):
 
         return rw
 
-    def losses(self, model, x):
-        w_pred_fun = jax.vmap(self.w, (None, 0))
-        w_x_pred_fun = jax.vmap(self.w_x, (None, 0))
-        M_pred_fun = jax.vmap(self.M, (None, 0))
-        Q_pred_fun = jax.vmap(self.Q, (None, 0))
+    def losses(self, x):
+        w_pred_fun = jax.vmap(self.w)
+        w_x_pred_fun = jax.vmap(self.w_x)
+        M_pred_fun = jax.vmap(self.M)
+        Q_pred_fun = jax.vmap(self.Q)
 
-        res_w_fun = jax.vmap(self.res_w, (None, 0))
+        res_w_fun = jax.vmap(self.res_w)
         
         if self.w_bc_coords is None:
             w_bc_loss = jnp.array(0.)
         else:
-            w_bc_pred = w_pred_fun(model, self.w_bc_coords)
+            w_bc_pred = w_pred_fun(self.w_bc_coords)
             w_bc_loss = jnp.mean((w_bc_pred - self.w_bc_values)**2)
 
         if self.w_x_bc_coords is None:
             w_x_bc_loss = jnp.array(0.)
         else:
-            w_x_bc_pred = w_x_pred_fun(model, self.w_x_bc_coords)
+            w_x_bc_pred = w_x_pred_fun(self.w_x_bc_coords)
             w_x_bc_loss = jnp.mean((w_x_bc_pred - self.w_x_bc_values)**2)
 
         if self.M_bc_coords is None:
             M_bc_loss = jnp.array(0.)
         else:
-            M_bc_pred = M_pred_fun(model, self.M_bc_coords)
+            M_bc_pred = M_pred_fun(self.M_bc_coords)
             M_bc_loss = jnp.mean((M_bc_pred - self.M_bc_values)**2)
 
         if self.Q_bc_coords is None:
             Q_bc_loss = jnp.array(0.)
         else:
-            Q_bc_pred = Q_pred_fun(model, self.Q_bc_coords)
+            Q_bc_pred = Q_pred_fun(self.Q_bc_coords)
             Q_bc_loss = jnp.mean((Q_bc_pred - self.Q_bc_values)**2)
 
-        rw_pred = res_w_fun(model, x)
+        rw_pred = res_w_fun(x)
         rw_loss = jnp.mean(rw_pred**2)
 
         loss_dict = {
@@ -165,8 +165,8 @@ class PINN(eqx.Module):
         }
         return loss_dict
 
-    def loss(self, model, weights, x):
-        losses = self.losses(model, x)
+    def loss(self, weights, x):
+        losses = self.losses(x)
         weighted_losses = jax.tree.map(lambda x, y: x * y, losses, weights)
         loss = jax.tree.reduce(lambda x, y: x + y, weighted_losses)
         return loss
