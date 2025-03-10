@@ -7,8 +7,6 @@ from jaxtyping import Array, PRNGKeyArray
 import paramax
 import equinox as eqx
 
-from ..nn.ffnn import FFNN
-
 
 # === -------------------------------------------------------------------- === #
 # PINN
@@ -16,7 +14,7 @@ from ..nn.ffnn import FFNN
 
 class PINN(eqx.Module):
     """ A PINN for the linear elastic Euler-Bernoulli beam."""
-    nn: FFNN
+    nn: eqx.Module
     EI: float
     L: float
     q: float
