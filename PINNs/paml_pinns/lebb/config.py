@@ -16,10 +16,6 @@ class Config:
     q: float
     bc_case: int
     dataset_size: int
-    steps: int
-    learning_rate: float
-    batch_size: int
-    weights: dict[str, float]
     non_dim: bool
 
     def __init__(
@@ -30,7 +26,6 @@ class Config:
         q: float,
         bc_case: int,
         dataset_size: int,
-        weights: dict[str, float],
         non_dim: bool
     ):
         self.EI = EI
@@ -39,7 +34,6 @@ class Config:
         self.q = q
         self.bc_case = bc_case
         self.dataset_size = dataset_size
-        self.weights = weights
         self.non_dim = non_dim
 
 
