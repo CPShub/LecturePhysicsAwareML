@@ -30,9 +30,6 @@ class Config:
         q: float,
         bc_case: int,
         dataset_size: int,
-        steps: int,
-        learning_rate: float,
-        batch_size: int,
         weights: dict[str, float],
         non_dim: bool
     ):
@@ -42,9 +39,6 @@ class Config:
         self.q = q
         self.bc_case = bc_case
         self.dataset_size = dataset_size
-        self.steps = steps
-        self.learning_rate = learning_rate
-        self.batch_size = batch_size
         self.weights = weights
         self.non_dim = non_dim
 
@@ -61,7 +55,6 @@ def get_config_decorator(fun: Callable[[int], Tuple[float, float, float, float]]
     def wrapper(
         bc_case: int,
         non_dim: bool,
-        steps: int = 50_000
     ):
         EI, L, F, q = fun(bc_case)
 
@@ -72,16 +65,6 @@ def get_config_decorator(fun: Callable[[int], Tuple[float, float, float, float]]
             q=q,
             bc_case=bc_case,
             dataset_size=1_000,
-            steps=steps,
-            learning_rate=1e-3,
-            batch_size=32,
-            weights={
-                "w_bc": 1.0,
-                "w_x_bc": 1.0,
-                "M_bc": 1.0,
-                "Q_bc": 1.0,
-                "rw": 1.0
-            },
             non_dim=non_dim
         )
         return config

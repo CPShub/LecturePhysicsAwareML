@@ -7,6 +7,7 @@ import paramax
 
 from matplotlib import pyplot as plt
 
+
 @eqx.filter_jit
 def compute_mse(model, x, y):
     model = paramax.unwrap(model)

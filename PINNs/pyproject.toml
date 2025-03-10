@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pinns"
+name = "paml_pinns"
 version = "25.2"
 description = "Package providing modules for the PINN task."
 authors = [
@@ -25,11 +25,8 @@ Repository = "https://github.com/CPSHub/LecturePhysicsAwareML"
 Issues = "https://github.com/CPSHub/LecturePhysicsAwareML"
 
 [tool.setuptools.packages.find]
-where = ["pinns"]
+where = ["."]
 
-# [project.scripts]
-# feapcall = "feapcall.cli:app"
-# 
 # [tool.pyright]
 # venvPath = "."
 # venv = ".venv"

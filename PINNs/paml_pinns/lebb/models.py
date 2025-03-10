@@ -1,4 +1,4 @@
-from typing import Tuple, Self
+from typing import Tuple
 
 import jax
 import jax.numpy as jnp
@@ -7,7 +7,7 @@ from jaxtyping import Array, PRNGKeyArray
 import paramax
 import equinox as eqx
 
-from ..nn import FFNN
+from ..nn.ffnn import FFNN
 
 
 # === -------------------------------------------------------------------- === #
