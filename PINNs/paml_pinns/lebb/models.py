@@ -38,14 +38,7 @@ class PINN(eqx.Module):
         *,
         key: PRNGKeyArray,
     ):
-        self.nn = FFNN(
-            in_features=1,
-            hidden_features=[8, 8],
-            out_features=1,
-            activations=[jax.nn.tanh, jax.nn.tanh],
-            final_activation=lambda x: x,
-            key=key
-        )
+        self.nn = eqx.nn.MLP(1, 1, 8, 2, jax.nn.tanh, key=key)
         self.EI = EI
         self.L = L
         self.q = q
