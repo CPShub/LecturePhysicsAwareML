@@ -103,7 +103,7 @@ class PINN(eqx.Module):
     def w_xxxx(self, x: Array) -> Array:
         return jax.jacfwd(self.w_xxx)(x)[0]
 
-    def res_w(self, x: Array):
+    def res(self, x: Array):
         w_xxxx = self.w_xxxx(x)
         # The following line defines the residual for a constant line load.
         # To change that in the future, the right hand side of this equation
@@ -113,38 +113,31 @@ class PINN(eqx.Module):
         return rw
 
     def losses(self, x):
-        w_pred_fun = jax.vmap(self.w)
-        w_x_pred_fun = jax.vmap(self.w_x)
-        M_pred_fun = jax.vmap(self.M)
-        Q_pred_fun = jax.vmap(self.Q)
-
-        res_w_fun = jax.vmap(self.res_w)
-        
         if self.w_bc_coords is None:
             w_bc_loss = jnp.array(0.)
         else:
-            w_bc_pred = w_pred_fun(self.w_bc_coords)
+            w_bc_pred = jax.vmap(self.w)(self.w_bc_coords)
             w_bc_loss = jnp.mean((w_bc_pred - self.w_bc_values)**2)
 
         if self.w_x_bc_coords is None:
             w_x_bc_loss = jnp.array(0.)
         else:
-            w_x_bc_pred = w_x_pred_fun(self.w_x_bc_coords)
+            w_x_bc_pred = jax.vmap(self.w_x)(self.w_x_bc_coords)
             w_x_bc_loss = jnp.mean((w_x_bc_pred - self.w_x_bc_values)**2)
 
         if self.M_bc_coords is None:
             M_bc_loss = jnp.array(0.)
         else:
-            M_bc_pred = M_pred_fun(self.M_bc_coords)
+            M_bc_pred = jax.vmap(self.M)(self.M_bc_coords)
             M_bc_loss = jnp.mean((M_bc_pred - self.M_bc_values)**2)
 
         if self.Q_bc_coords is None:
             Q_bc_loss = jnp.array(0.)
         else:
-            Q_bc_pred = Q_pred_fun(self.Q_bc_coords)
+            Q_bc_pred = jax.vmap(self.Q)(self.Q_bc_coords)
             Q_bc_loss = jnp.mean((Q_bc_pred - self.Q_bc_values)**2)
 
-        rw_pred = res_w_fun(x)
+        rw_pred = jax.vmap(self.res)(x)
         rw_loss = jnp.mean(rw_pred**2)
 
         loss_dict = {
