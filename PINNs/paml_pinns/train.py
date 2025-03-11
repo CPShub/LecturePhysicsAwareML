@@ -38,10 +38,10 @@ def train(
     optim = optax.adam(learning_rate)
     opt_state = optim.init(params)
 
-    iter_data = dataloader((x, x), batch_size) # TODO: This is ugly. Fix the data loader
+    iter_data = dataloader((x,), batch_size) # TODO: This is ugly. Fix the data loader
 
     loss = None
-    for step, (x, _) in zip(range(steps), iter_data):
+    for step, (x,) in zip(range(steps), iter_data):
         loss, params, opt_state = make_step(params, static, weights, x, opt_state)
         loss = loss.item()
         if step % 1000 == 0:

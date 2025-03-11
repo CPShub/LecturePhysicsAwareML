@@ -1,5 +1,7 @@
-from .eval import evaluate
-from .config import Config
-from ..train import train
-from .utils import get_data_decorator, get_config_decorator
-from .models import PINN
+from .eval import evaluate as evaluate
+from .config import (
+    Config as Config,
+    get_config_decorator as get_config_decorator,
+)
+from .cases import get_data_decorator as get_data_decorator
+from .models import PINN as PINN

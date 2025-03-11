@@ -18,7 +18,7 @@ BCFunction = Callable[[float, float, float, float, Array], BeamSolution]
 
 @jax.jit
 def bc_case_0(
-    EI: float, 
+    EI: float,
     L: float, 
     F: float, 
     q: float,

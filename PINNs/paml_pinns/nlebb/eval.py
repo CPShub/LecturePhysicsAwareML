@@ -26,79 +26,63 @@ def model_fn(model, x: Array) -> Array:
 def evaluate(model, x, y):
     err = compute_mse(model, x, y)
 
-    u, u_x, u_xx, w, w_x, w_xx, w_xxx, w_xxxx = y
+    u, w, w_x, N, M, Q = y
 
     print("\nEvaluation:\n-----------")
     print(f"  MSE u:     {err[0]}")
-    print(f"  MSE u_x:   {err[1]}")
-    print(f"  MSE u_xx:  {err[2]}")
-    print(f"  MSE w:     {err[3]}")
-    print(f"  MSE w':    {err[4]}")
-    print(f"  MSE w'':   {err[5]}")
-    print(f"  MSE w''':  {err[6]}")
-    print(f"  MSE w'''': {err[7]}")
+    print(f"  MSE w:     {err[1]}")
+    print(f"  MSE w':    {err[2]}")
+    print(f"  MSE N:     {err[3]}")
+    print(f"  MSE M:     {err[4]}")
+    print(f"  MSE Q:     {err[5]}")
 
     pred = model_fn(model, x)
 
-    u_pred, u_x_pred, u_xx_pred, w_pred, w_x_pred, w_xx_pred, w_xxx_pred, w_xxxx_pred = pred
+    u_pred, w_pred, w_x_pred, N_pred, M_pred, Q_pred = pred
 
-    fig, axs = plt.subplots(4, 2, figsize=(10, 16))
+    fig, axs = plt.subplots(3, 2, figsize=(10, 12))
 
     axs[0, 0].plot(x, u_pred, 'r', label='PINN')
-    axs[0, 0].plot(x, u, 'b', linestyle='--', label='analytical')
+    axs[0, 0].plot(x, u, 'b', linestyle='--', label='data')
     axs[0, 0].set_xlabel(r'$x$')
     axs[0, 0].set_ylabel(r'$u$')
     axs[0, 0].grid()
     axs[0, 0].legend()
 
-    axs[0, 1].plot(x, u_x_pred, 'r', label='PINN')
-    axs[0, 1].plot(x, u_x, 'b', linestyle='--', label='analytical')
+    axs[0, 1].plot(x, w_pred, 'r', label='PINN')
+    axs[0, 1].plot(x, w, 'b', linestyle='--', label='data')
     axs[0, 1].set_xlabel(r'$x$')
-    axs[0, 1].set_ylabel(r'$\partial_{x}u$')
+    axs[0, 1].set_ylabel(r'$w$')
     axs[0, 1].grid()
     axs[0, 1].legend()
 
-    axs[1, 0].plot(x, u_xx_pred, 'r', label='PINN')
-    axs[1, 0].plot(x, u_xx, 'b', linestyle='--', label='analytical')
+    axs[1, 0].plot(x, w_x_pred, 'r', label='PINN')
+    axs[1, 0].plot(x, w_x, 'b', linestyle='--', label='data')
     axs[1, 0].set_xlabel(r'$x$')
-    axs[1, 0].set_ylabel(r'$\partial_{xx}u$')
+    axs[1, 0].set_ylabel(r'$\partial_{x}w$')
     axs[1, 0].grid()
     axs[1, 0].legend()
 
-    axs[1, 1].plot(x, w_pred, 'r', label='PINN')
-    axs[1, 1].plot(x, w, 'b', linestyle='--', label='analytical')
+    axs[1, 1].plot(x, N_pred, 'r', label='PINN')
+    axs[1, 1].plot(x, N, 'b', linestyle='--', label='data')
     axs[1, 1].set_xlabel(r'$x$')
-    axs[1, 1].set_ylabel(r'$w$')
+    axs[1, 1].set_ylabel(r'$N$')
     axs[1, 1].grid()
     axs[1, 1].legend()
 
-    axs[2, 0].plot(x, w_x_pred, 'r', label='PINN')
-    axs[2, 0].plot(x, w_x, 'b', linestyle='--', label='analytical')
+    axs[2, 0].plot(x, M_pred, 'r', label='PINN')
+    axs[2, 0].plot(x, M, 'b', linestyle='--', label='data')
     axs[2, 0].set_xlabel(r'$x$')
-    axs[2, 0].set_ylabel(r'$\partial_{x}w$')
+    axs[2, 0].set_ylabel(r'$M$')
     axs[2, 0].grid()
     axs[2, 0].legend()
 
-    axs[2, 1].plot(x, w_xx_pred, 'r', label='PINN')
-    axs[2, 1].plot(x, w_xx, 'b', linestyle='--', label='analytical')
+    axs[2, 1].plot(x, Q_pred, 'r', label='PINN')
+    axs[2, 1].plot(x, Q, 'b', linestyle='--', label='data')
     axs[2, 1].set_xlabel(r'$x$')
-    axs[2, 1].set_ylabel(r'$\partial_{xx}w$')
+    axs[2, 1].set_ylabel(r'$Q$')
     axs[2, 1].grid()
     axs[2, 1].legend()
-
-    axs[3, 0].plot(x, w_xxx_pred, 'r', label='PINN')
-    axs[3, 0].plot(x, w_xxx, 'b', linestyle='--', label='analytical')
-    axs[3, 0].set_xlabel(r'$x$')
-    axs[3, 0].set_ylabel(r'$\partial_{xxx}w$')
-    axs[3, 0].grid()
-    axs[3, 0].legend()
-
-    axs[3, 1].plot(x, w_xxxx_pred, 'r', label='PINN')
-    axs[3, 1].plot(x, w_xxxx, 'b', linestyle='--', label='analytical')
-    axs[3, 1].set_xlabel(r'$x$')
-    axs[3, 1].set_ylabel(r'$\partial_{xxxx}w$')
-    axs[3, 1].grid()
-    axs[3, 1].legend()
 
     plt.tight_layout()
     plt.show()
