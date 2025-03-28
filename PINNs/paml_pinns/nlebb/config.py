@@ -3,10 +3,6 @@ from dataclasses import dataclass
 from typing import Tuple
 
 
-# === -------------------------------------------------------------------- === #
-# Config
-# === -------------------------------------------------------------------- === #
-
 @dataclass
 class Config:
     """Configuration for data generation and PINN training."""
@@ -20,10 +16,6 @@ class Config:
     bc_case: int
     dataset_size: int
 
-
-# === -------------------------------------------------------------------- === #
-# get_config_decorator
-# === -------------------------------------------------------------------- === #
 
 def get_config_decorator(fun: Callable[[int], Tuple[float, float, float, float]]):
     """

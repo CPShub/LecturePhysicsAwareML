@@ -33,50 +33,50 @@ class PINN(eqx.Module):
         *,
         key: PRNGKeyArray,
     ):
-        self.nn = eqx.nn.MLP(1, 2, 16, 2, jax.nn.tanh, key=key)
+        self.nn = eqx.nn.MLP("scalar", 2, 16, 2, jax.nn.tanh, key=key)
         self.params = params
 
         if bc["u_bc_coords"] is None:
             self.u_bc_coords = None
             self.u_bc_values = None
         else:
-            self.u_bc_coords = px.NonTrainable(bc["u_bc_coords"].reshape(-1, 1))
-            self.u_bc_values = px.NonTrainable(bc["u_bc_values"].reshape(-1, 1))
+            self.u_bc_coords = px.NonTrainable(bc["u_bc_coords"])
+            self.u_bc_values = px.NonTrainable(bc["u_bc_values"])
 
         if bc["w_bc_coords"] is None:
             self.w_bc_coords = None
             self.w_bc_values = None
         else:
-            self.w_bc_coords = px.NonTrainable(bc["w_bc_coords"].reshape(-1, 1))
-            self.w_bc_values = px.NonTrainable(bc["w_bc_values"].reshape(-1, 1))
+            self.w_bc_coords = px.NonTrainable(bc["w_bc_coords"])
+            self.w_bc_values = px.NonTrainable(bc["w_bc_values"])
 
         if bc["w_x_bc_coords"] is None:
             self.w_x_bc_coords = None
             self.w_x_bc_values = None
         else:
-            self.w_x_bc_coords = px.NonTrainable(bc["w_x_bc_coords"].reshape(-1, 1))
-            self.w_x_bc_values = px.NonTrainable(bc["w_x_bc_values"].reshape(-1, 1))
+            self.w_x_bc_coords = px.NonTrainable(bc["w_x_bc_coords"])
+            self.w_x_bc_values = px.NonTrainable(bc["w_x_bc_values"])
 
         if bc["N_bc_coords"] is None:
             self.N_bc_coords = None
             self.N_bc_values = None
         else:
-            self.N_bc_coords = px.NonTrainable(bc["N_bc_coords"].reshape(-1, 1))
-            self.N_bc_values = px.NonTrainable(bc["N_bc_values"].reshape(-1, 1))
+            self.N_bc_coords = px.NonTrainable(bc["N_bc_coords"])
+            self.N_bc_values = px.NonTrainable(bc["N_bc_values"])
 
         if bc["M_bc_coords"] is None:
             self.M_bc_coords = None
             self.M_bc_values = None
         else:
-            self.M_bc_coords = px.NonTrainable(bc["M_bc_coords"].reshape(-1, 1))
-            self.M_bc_values = px.NonTrainable(bc["M_bc_values"].reshape(-1, 1))
+            self.M_bc_coords = px.NonTrainable(bc["M_bc_coords"])
+            self.M_bc_values = px.NonTrainable(bc["M_bc_values"])
 
         if bc["Q_bc_coords"] is None:
             self.Q_bc_coords = None
             self.Q_bc_values = None
         else:
-            self.Q_bc_coords = px.NonTrainable(bc["Q_bc_coords"].reshape(-1, 1))
-            self.Q_bc_values = px.NonTrainable(bc["Q_bc_values"].reshape(-1, 1))
+            self.Q_bc_coords = px.NonTrainable(bc["Q_bc_coords"])
+            self.Q_bc_values = px.NonTrainable(bc["Q_bc_values"])
 
     def __call__(self, x: Array) -> Array:
         u = self.u(x)
@@ -100,26 +100,26 @@ class PINN(eqx.Module):
         return u
 
     def u_x(self, x: Array) -> Array:
-        return jax.jacfwd(self.u)(x)[0]
+        return jax.grad(self.u)(x)
 
     def u_xx(self, x: Array) -> Array:
-        return jax.jacfwd(self.u_x)(x)[0]
+        return jax.grad(self.u_x)(x)
 
     def w(self, x: Array) -> Array:
         _, w = self.forward(x)
         return w
 
     def w_x(self, x: Array) -> Array:
-        return jax.jacfwd(self.w)(x)[0]
+        return jax.grad(self.w)(x)
 
     def w_xx(self, x: Array) -> Array:
-        return jax.jacfwd(self.w_x)(x)[0]
+        return jax.grad(self.w_x)(x)
 
     def w_xxx(self, x: Array) -> Array:
-        return jax.jacfwd(self.w_xx)(x)[0]
+        return jax.grad(self.w_xx)(x)
 
     def w_xxxx(self, x: Array) -> Array:
-        return jax.jacfwd(self.w_xxx)(x)[0]
+        return jax.grad(self.w_xxx)(x)
 
     def N(self, x: Array) -> Array:
         return self.params["EA"] * (self.u_x(x) + 0.5 * self.w_x(x) ** 2)
@@ -235,55 +235,55 @@ class MixedPINN(eqx.Module):
         *,
         key: PRNGKeyArray,
     ):
-        self.nn_u = eqx.nn.MLP(1, 1, 8, 1, jax.nn.tanh, key=key)
-        self.nn_w = eqx.nn.MLP(1, 1, 8, 1, jax.nn.tanh, key=key)
-        self.nn_w_x = eqx.nn.MLP(1, 1, 8, 1, jax.nn.tanh, key=key)
-        self.nn_N = eqx.nn.MLP(1, 1, 8, 1, jax.nn.tanh, key=key)
-        self.nn_M = eqx.nn.MLP(1, 1, 8, 1, jax.nn.tanh, key=key)
-        self.nn_Q = eqx.nn.MLP(1, 1, 8, 1, jax.nn.tanh, key=key)
+        self.nn_u = eqx.nn.MLP("scalar", "scalar", 8, 1, jax.nn.tanh, key=key)
+        self.nn_w = eqx.nn.MLP("scalar", "scalar", 8, 1, jax.nn.tanh, key=key)
+        self.nn_w_x = eqx.nn.MLP("scalar", "scalar", 8, 1, jax.nn.tanh, key=key)
+        self.nn_N = eqx.nn.MLP("scalar", "scalar", 8, 1, jax.nn.tanh, key=key)
+        self.nn_M = eqx.nn.MLP("scalar", "scalar", 8, 1, jax.nn.tanh, key=key)
+        self.nn_Q = eqx.nn.MLP("scalar", "scalar", 8, 1, jax.nn.tanh, key=key)
         self.params = params
 
         if bc["u_bc_coords"] is None:
             self.u_bc_coords = None
             self.u_bc_values = None
         else:
-            self.u_bc_coords = px.NonTrainable(bc["u_bc_coords"].reshape(-1, 1))
-            self.u_bc_values = px.NonTrainable(bc["u_bc_values"].reshape(-1, 1))
+            self.u_bc_coords = px.NonTrainable(bc["u_bc_coords"])
+            self.u_bc_values = px.NonTrainable(bc["u_bc_values"])
 
         if bc["w_bc_coords"] is None:
             self.w_bc_coords = None
             self.w_bc_values = None
         else:
-            self.w_bc_coords = px.NonTrainable(bc["w_bc_coords"].reshape(-1, 1))
-            self.w_bc_values = px.NonTrainable(bc["w_bc_values"].reshape(-1, 1))
+            self.w_bc_coords = px.NonTrainable(bc["w_bc_coords"])
+            self.w_bc_values = px.NonTrainable(bc["w_bc_values"])
 
         if bc["w_x_bc_coords"] is None:
             self.w_x_bc_coords = None
             self.w_x_bc_values = None
         else:
-            self.w_x_bc_coords = px.NonTrainable(bc["w_x_bc_coords"].reshape(-1, 1))
-            self.w_x_bc_values = px.NonTrainable(bc["w_x_bc_values"].reshape(-1, 1))
+            self.w_x_bc_coords = px.NonTrainable(bc["w_x_bc_coords"])
+            self.w_x_bc_values = px.NonTrainable(bc["w_x_bc_values"])
 
         if bc["N_bc_coords"] is None:
             self.N_bc_coords = None
             self.N_bc_values = None
         else:
-            self.N_bc_coords = px.NonTrainable(bc["N_bc_coords"].reshape(-1, 1))
-            self.N_bc_values = px.NonTrainable(bc["N_bc_values"].reshape(-1, 1))
+            self.N_bc_coords = px.NonTrainable(bc["N_bc_coords"])
+            self.N_bc_values = px.NonTrainable(bc["N_bc_values"])
 
         if bc["M_bc_coords"] is None:
             self.M_bc_coords = None
             self.M_bc_values = None
         else:
-            self.M_bc_coords = px.NonTrainable(bc["M_bc_coords"].reshape(-1, 1))
-            self.M_bc_values = px.NonTrainable(bc["M_bc_values"].reshape(-1, 1))
+            self.M_bc_coords = px.NonTrainable(bc["M_bc_coords"])
+            self.M_bc_values = px.NonTrainable(bc["M_bc_values"])
 
         if bc["Q_bc_coords"] is None:
             self.Q_bc_coords = None
             self.Q_bc_values = None
         else:
-            self.Q_bc_coords = px.NonTrainable(bc["Q_bc_coords"].reshape(-1, 1))
-            self.Q_bc_values = px.NonTrainable(bc["Q_bc_values"].reshape(-1, 1))
+            self.Q_bc_coords = px.NonTrainable(bc["Q_bc_coords"])
+            self.Q_bc_values = px.NonTrainable(bc["Q_bc_values"])
 
     def __call__(self, x: Array) -> Array:
         u = self.u(x)
@@ -310,7 +310,7 @@ class MixedPINN(eqx.Module):
         return u
 
     def u_x(self, x: Array) -> Array:
-        return jax.jacfwd(self.u)(x)[0]
+        return jax.grad(self.u)(x)
 
     def w(self, x: Array) -> Array:
         _, w, _, _, _, _ = self.forward(x)
@@ -321,30 +321,30 @@ class MixedPINN(eqx.Module):
         return w_x
 
     def w_xx(self, x: Array) -> Array:
-        return jax.jacfwd(self.w_x)(x)[0]
+        return jax.grad(self.w_x)(x)
 
     def N(self, x: Array) -> Array:
         _, _, _, N, _, _ = self.forward(x)
         return N
 
     def N_x(self, x: Array) -> Array:
-        return jax.jacfwd(self.N)(x)[0]
+        return jax.grad(self.N)(x)
 
     def Nw_x(self, x: Array) -> Array:
         return self.N(x) * self.w_x(x)
 
     def Nw_x_x(self, x: Array) -> Array:
-        return jax.jacfwd(self.Nw_x)(x)[0]
+        return jax.grad(self.Nw_x)(x)
 
     def M(self, x: Array) -> Array:
         _, _, _, _, M, _ = self.forward(x)
         return M
 
     def M_x(self, x: Array) -> Array:
-        return jax.jacfwd(self.M)(x)[0]
+        return jax.grad(self.M)(x)
 
     def M_xx(self, x: Array) -> Array:
-        return jax.jacfwd(self.M_x)(x)[0]
+        return jax.grad(self.M_x)(x)
 
     def Q(self, x: Array) -> Array:
         _, _, _, _, _, Q = self.forward(x)
@@ -358,7 +358,7 @@ class MixedPINN(eqx.Module):
         # Residuals assuming constant line loads
         ru = -self.N_x(x) - self.params["f0"]
         rw = -self.Nw_x_x(x) - self.M_xx(x) - self.params["q0"]
-        rw_x = self.w_x(x) - jax.jacfwd(self.w)(x)[0]
+        rw_x = self.w_x(x) - jax.grad(self.w)(x)
         rN = N - self.N(x)
         rM = M - self.M(x)
         rQ = Q - self.Q(x)
