@@ -60,7 +60,7 @@ def get_data_decorator(bc_func: Callable[[Config], dict[str, Array]]):
         bc_case = get_bc_case(config.bc_case)
         bc = bc_func(config)
 
-        x = jnp.linspace(0.0, config.L, config.dataset_size).reshape(-1, 1)
+        x = jnp.linspace(0.0, config.L, config.dataset_size)
         y = jax.vmap(bc_case, (None, None, None, None, 0))(
             config.EI, config.L, config.F, config.q, x
         )

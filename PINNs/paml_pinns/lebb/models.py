@@ -32,7 +32,7 @@ class PINN(eqx.Module):
         *,
         key: PRNGKeyArray,
     ):
-        self.nn = eqx.nn.MLP(1, 1, 8, 2, jax.nn.tanh, key=key)
+        self.nn = eqx.nn.MLP("scalar", "scalar", 8, 2, jax.nn.tanh, key=key)
         self.EI = EI
         self.L = L
         self.q = q
@@ -41,29 +41,29 @@ class PINN(eqx.Module):
             self.w_bc_coords = None
             self.w_bc_values = None
         else:
-            self.w_bc_coords = px.NonTrainable(bc["w_bc_coords"].reshape(-1, 1))
-            self.w_bc_values = px.NonTrainable(bc["w_bc_values"].reshape(-1, 1))
+            self.w_bc_coords = px.NonTrainable(bc["w_bc_coords"])
+            self.w_bc_values = px.NonTrainable(bc["w_bc_values"])
 
         if bc["w_x_bc_coords"] is None:
             self.w_x_bc_coords = None
             self.w_x_bc_values = None
         else:
-            self.w_x_bc_coords = px.NonTrainable(bc["w_x_bc_coords"].reshape(-1, 1))
-            self.w_x_bc_values = px.NonTrainable(bc["w_x_bc_values"].reshape(-1, 1))
+            self.w_x_bc_coords = px.NonTrainable(bc["w_x_bc_coords"])
+            self.w_x_bc_values = px.NonTrainable(bc["w_x_bc_values"])
 
         if bc["M_bc_coords"] is None:
             self.M_bc_coords = None
             self.M_bc_values = None
         else:
-            self.M_bc_coords = px.NonTrainable(bc["M_bc_coords"].reshape(-1, 1))
-            self.M_bc_values = px.NonTrainable(bc["M_bc_values"].reshape(-1, 1))
+            self.M_bc_coords = px.NonTrainable(bc["M_bc_coords"])
+            self.M_bc_values = px.NonTrainable(bc["M_bc_values"])
 
         if bc["Q_bc_coords"] is None:
             self.Q_bc_coords = None
             self.Q_bc_values = None
         else:
-            self.Q_bc_coords = px.NonTrainable(bc["Q_bc_coords"].reshape(-1, 1))
-            self.Q_bc_values = px.NonTrainable(bc["Q_bc_values"].reshape(-1, 1))
+            self.Q_bc_coords = px.NonTrainable(bc["Q_bc_coords"])
+            self.Q_bc_values = px.NonTrainable(bc["Q_bc_values"])
 
     def __call__(self, x: Array) -> Array:
         w = self.w(x)
@@ -82,22 +82,22 @@ class PINN(eqx.Module):
         return self.forward(x)
 
     def w_x(self, x: Array) -> Array:
-        return jax.jacfwd(self.w)(x)[0]
+        return jax.grad(self.w)(x)
 
     def w_xx(self, x: Array) -> Array:
-        return jax.jacfwd(self.w_x)(x)[0]
+        return jax.grad(self.w_x)(x)
 
     def M(self, x: Array) -> Array:
         return - self.EI * self.w_xx(x)
 
     def w_xxx(self, x: Array) -> Array:
-        return jax.jacfwd(self.w_xx)(x)[0]
+        return jax.grad(self.w_xx)(x)
 
     def Q(self, x: Array) -> Array:
         return - self.EI * self.w_xxx(x) 
 
     def w_xxxx(self, x: Array) -> Array:
-        return jax.jacfwd(self.w_xxx)(x)[0]
+        return jax.grad(self.w_xxx)(x)
 
     def res(self, x: Array):
         w_xxxx = self.w_xxxx(x)

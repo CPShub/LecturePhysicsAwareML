@@ -5,7 +5,7 @@ from jaxtyping import Array
 
 import equinox as eqx
 import paramax
-import optax 
+import optax
 
 from .utils import dataloader
 
@@ -17,9 +17,8 @@ def train(
     *,
     steps: int,
     batch_size: int = 32,
-    learning_rate: float = 1e-3
+    learning_rate: float = 1e-3,
 ):
-
     @partial(jax.jit, static_argnums=1)
     @jax.value_and_grad
     def compute_loss(params, static, weights, x):
@@ -38,7 +37,7 @@ def train(
     optim = optax.adam(learning_rate)
     opt_state = optim.init(params)
 
-    iter_data = dataloader((x,), batch_size) # TODO: This is ugly. Fix the data loader
+    iter_data = dataloader((x,), batch_size)
 
     loss = None
     for step, (x,) in zip(range(steps), iter_data):
