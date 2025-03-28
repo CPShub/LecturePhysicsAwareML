@@ -4,13 +4,9 @@ import jax
 import jax.numpy as jnp
 from jaxtyping import Array, PRNGKeyArray
 
-import paramax
+import paramax as px
 import equinox as eqx
 
-
-# === -------------------------------------------------------------------- === #
-# PINN
-# === -------------------------------------------------------------------- === #
 
 class PINN(eqx.Module):
     """ A PINN for the linear elastic Euler-Bernoulli beam."""
@@ -18,14 +14,14 @@ class PINN(eqx.Module):
     EI: float
     L: float
     q: float
-    w_bc_coords: paramax.NonTrainable | None
-    w_bc_values: paramax.NonTrainable | None
-    w_x_bc_coords: paramax.NonTrainable | None
-    w_x_bc_values: paramax.NonTrainable | None
-    M_bc_coords: paramax.NonTrainable | None
-    M_bc_values: paramax.NonTrainable | None
-    Q_bc_coords: paramax.NonTrainable | None
-    Q_bc_values: paramax.NonTrainable | None
+    w_bc_coords: px.NonTrainable | None
+    w_bc_values: px.NonTrainable | None
+    w_x_bc_coords: px.NonTrainable | None
+    w_x_bc_values: px.NonTrainable | None
+    M_bc_coords: px.NonTrainable | None
+    M_bc_values: px.NonTrainable | None
+    Q_bc_coords: px.NonTrainable | None
+    Q_bc_values: px.NonTrainable | None
 
     def __init__(
         self,
@@ -45,29 +41,29 @@ class PINN(eqx.Module):
             self.w_bc_coords = None
             self.w_bc_values = None
         else:
-            self.w_bc_coords = paramax.NonTrainable(bc["w_bc_coords"].reshape(-1, 1))
-            self.w_bc_values = paramax.NonTrainable(bc["w_bc_values"].reshape(-1, 1))
+            self.w_bc_coords = px.NonTrainable(bc["w_bc_coords"].reshape(-1, 1))
+            self.w_bc_values = px.NonTrainable(bc["w_bc_values"].reshape(-1, 1))
 
         if bc["w_x_bc_coords"] is None:
             self.w_x_bc_coords = None
             self.w_x_bc_values = None
         else:
-            self.w_x_bc_coords = paramax.NonTrainable(bc["w_x_bc_coords"].reshape(-1, 1))
-            self.w_x_bc_values = paramax.NonTrainable(bc["w_x_bc_values"].reshape(-1, 1))
+            self.w_x_bc_coords = px.NonTrainable(bc["w_x_bc_coords"].reshape(-1, 1))
+            self.w_x_bc_values = px.NonTrainable(bc["w_x_bc_values"].reshape(-1, 1))
 
         if bc["M_bc_coords"] is None:
             self.M_bc_coords = None
             self.M_bc_values = None
         else:
-            self.M_bc_coords = paramax.NonTrainable(bc["M_bc_coords"].reshape(-1, 1))
-            self.M_bc_values = paramax.NonTrainable(bc["M_bc_values"].reshape(-1, 1))
+            self.M_bc_coords = px.NonTrainable(bc["M_bc_coords"].reshape(-1, 1))
+            self.M_bc_values = px.NonTrainable(bc["M_bc_values"].reshape(-1, 1))
 
         if bc["Q_bc_coords"] is None:
             self.Q_bc_coords = None
             self.Q_bc_values = None
         else:
-            self.Q_bc_coords = paramax.NonTrainable(bc["Q_bc_coords"].reshape(-1, 1))
-            self.Q_bc_values = paramax.NonTrainable(bc["Q_bc_values"].reshape(-1, 1))
+            self.Q_bc_coords = px.NonTrainable(bc["Q_bc_coords"].reshape(-1, 1))
+            self.Q_bc_values = px.NonTrainable(bc["Q_bc_values"].reshape(-1, 1))
 
     def __call__(self, x: Array) -> Array:
         w = self.w(x)

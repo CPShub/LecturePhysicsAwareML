@@ -4,4 +4,4 @@ from .config import (
     get_config_decorator as get_config_decorator,
 )
 from .cases import get_data_decorator as get_data_decorator
-from .models import PINN as PINN
+from .models import create_pinn as create_pinn, PINN as PINN
