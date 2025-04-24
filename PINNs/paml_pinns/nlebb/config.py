@@ -17,7 +17,7 @@ class Config:
     dataset_size: int
 
 
-def get_config_decorator(fun: Callable[[int], Tuple[float, float, float, float]]):
+def get_config_decorator(fun: Callable[[int], Tuple[float, ...]]):
     """
     A decorator to expose only those setting to the user that are relevant
     for completing the tasks.

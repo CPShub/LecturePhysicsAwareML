@@ -8,8 +8,10 @@ from .config import Config
 
 
 # Define type aliases
-BeamSolution = Tuple[Array, Array, Array, Array, Array]
-BCFunction = Callable[[float, float, float, float, float, Array], BeamSolution]
+BeamSolution = Tuple[Array, Array, Array, Array, Array, Array]
+BCFunction = Callable[
+    [float, float, float, float, float, float, float, Array], BeamSolution
+]
 
 
 @jax.jit

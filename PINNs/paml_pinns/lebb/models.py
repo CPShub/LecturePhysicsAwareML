@@ -65,7 +65,7 @@ class PINN(eqx.Module):
             self.Q_bc_coords = px.NonTrainable(bc["Q_bc_coords"])
             self.Q_bc_values = px.NonTrainable(bc["Q_bc_values"])
 
-    def __call__(self, x: Array) -> Array:
+    def __call__(self, x: Array) -> Tuple[Array, ...]:
         w = self.w(x)
         w_x = self.w_x(x)
         M = self.M(x)
@@ -74,7 +74,7 @@ class PINN(eqx.Module):
 
         return w, w_x, M, Q, w_xxxx
 
-    def forward(self, x: Array) -> Tuple[Array, ...]:
+    def forward(self, x: Array) -> Array:
         x = x / self.L
         return self.nn(x)
 
