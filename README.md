@@ -18,12 +18,15 @@ This repository offers a collection of lecture materials and code examples accom
 ## Lecture material
 
 ### Chapter 01: Introduction
-* 'FFNN_introduction': Demo of regression of simple functions with FFNNs
+* `FFNN_introduction`: Demo of regression of simple functions with FFNNs
 
 ### Chapter 02: Physics-based modeling & simulation
-* 'ode_examples': Numerical integration of ODEs in MATLAB
-* 'nlebb': Finite element discretization and numerical integration of dynamic nonlinear Euler Bernoulli beam in MATLAB
+* `ode_examples`: Numerical integration of ODEs in MATLAB
+* `nlebb`: Finite element discretization and numerical integration of dynamic nonlinear Euler Bernoulli beam in MATLAB
+
+### Chapter 05: Physics-aware losses
+* `PINNs`: Physics-informed neural networks for the geometrically linear and nonlinear Euler-Bernoulli beam using Python and Jax
 
 ### Chapter 06: PAML for dynamic systems
-* 'nlebb_dynamic_batch': Automated data generation with the non-linear Euler Bernoulli beam in MATLAB
-* 'NeuralODE': Demo of augmented neural ODEs in JAX
+* `nlebb_dynamic_batch`: Automated data generation with the non-linear Euler Bernoulli beam in MATLAB
+* `NeuralODE`: Demo of augmented neural ODEs in JAX
