@@ -28,7 +28,7 @@ class PINN(eqx.Module):
         EI: float,
         L: float,
         q: float,
-        bc: dict[str, Array | None],
+        bc: dict[str, Array],
         *,
         key: PRNGKeyArray,
     ):
