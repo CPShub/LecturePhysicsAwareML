@@ -22,4 +22,4 @@ dependencies = ["jax", "equinox", "optax", "paramax", "matplotlib", "numpy"]
 
 [project.urls]
 Repository = "https://github.com/CPSHub/LecturePhysicsAwareML"
-Issues = "https://github.com/CPSHub/LecturePhysicsAwareML"
+Issues = "https://github.com/CPSHub/LecturePhysicsAwareML/issues"

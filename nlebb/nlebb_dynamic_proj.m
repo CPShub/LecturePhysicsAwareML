@@ -18,8 +18,7 @@ qm = 4;             % Number of modes for projection
 qdeim = 0; % 12;    % Use DEIM for f with ... modes
 
 % Neural network-based approximation
-qnn = 0;            % 0: Off, 1: No energy, 2: Energy
-fnw = fullfile('..', 'FFNN_ROM', 'data', 'weights.txt');
+qnn = 0;            % 0: Off, 1: Force, 2: Potential
 
 % Axial & transversal line load [N/m]
 load_f = 0;
@@ -28,24 +27,26 @@ load = @(x,t) [load_f, load_q];
 
 % Point forces at points [1,2,3,4]*L/4 [N]
 tPer = .1;                  % Vibration period [s]
+
+% Point forces at points [1,2,3,4]*L/4 [N]
 Nx = @(t) [0 0 0 0];
-Qz = @(t) [0 0 0 -10*sin(2*pi/tPer*t)];  
-% Qz = @(t) [0 0 0 -10*(1+t)*sin(2*pi/tPer*t)];
-% Qz = @(t) [0 0 0 multiphase_multisin(2,0.085,100,1,3,t)]; % Multisine train 1
-% Qz = @(t) [0 0 0 multiphase_multisin(2,0.085,100,2,3,t)]; % Multisine train 2
-% Qz = @(t) [0 0 0 multiphase_multisin(2,0.085,100,3,3,t)]; % Multisine train 3
-% Qz = @(t) [0 0 0 multiphase_multisin(1,0.103,78,1,1,t)];  % Multisine test 1
-% Qz = @(t) [0 0 0 1.5*sin(2*pi*6*t)];                      % Sine test
-% Qz = @(t) [0 0 0 -10*(t>.2)];                            % Step test
-% Qz = @(t) [0 0 0 -10*(t>.5)*(t<.51)];                   % Dirac test
-% Qz = @(t) [0 0 0 -2*t];                                   % Quasi static
 My = @(t) 0;                % Moment at x=L [Nm]
+%Qz = @(t) [0 0 0 -10*sin(2*pi/tPer*t)];  
+% Qz = @(t) [0 0 0 -10*(1+t)*sin(2*pi/tPer*t)];
+% Qz = @(t) [0 0 0 multiphase_multisin(2,0.085,100,1,3,t)];    % Multisine train 1
+% Qz = @(t) [0 0 0 multiphase_multisin(2,0.085,100,2,3,t)];    % Multisine train 2
+% Qz = @(t) [0 0 0 multiphase_multisin(2,0.085,100,3,3,t)];    % Multisine train 3
+% Qz = @(t) [0 0 0 multiphase_multisin(1,0.103,78,1,1,t)];     % Multisine test 1
+% Qz = @(t) [0 0 0 1.5*sin(2*pi*6*t)];                         % Sine test
+Qz = @(t) [0 0 0 -10*(t>.2)];                                % Step test
+% Qz = @(t) [0 0 0 -10*(t>.5)*(t<.51)];                        % Dirac test
+% Qz = @(t) [0 0 0 -2*t];                                      % Quasi static
 
 
 % -------------------------------------------------------------------------
 % --- CALL FUNCTION FOR DATA GENERATION (BEAM SIMULATION)
 
-[q0all, Qfall, QKQall] = nlebb_dynamic_fun(load, Nx, Qz, My, tPer, qmode, qm, qdeim, qnn, fnw);
+[q0all, Qfall, QKQall] = nlebb_dynamic_fun(load, Nx, Qz, My, tPer, qmode, qm, qdeim, qnn);
 
 % -------------------------------------------------------------------------
 % --- SAVE REDUCED DOFS AND INTERNAL FORCE VECTORS
@@ -57,7 +58,7 @@ writematrix(QKQall,'QKQall.txt')
 % -------------------------------------------------------------------------
 % -------------------------------------------------------------------------
 
-function [q0all, Qfall, QKQall] = nlebb_dynamic_fun(load, Nx, Qz, My, tPer, qmode, qm, qdeim, qnn, fnw)
+function [q0all, Qfall, QKQall] = nlebb_dynamic_fun(load, Nx, Qz, My, tPer, qmode, qm, qdeim, qnn)
 
 % -------------------------------------------------------------------------
 % --- INPUTS
@@ -78,12 +79,6 @@ param = [EA, EI, RA];
 % Dirichlet boundary conditions (0:free, 1:roler, 2:simple, 3:clamped)
 BC0 = 3;            % x=0
 BC1 = 0;            % x=L
-
-% Axial & transversal line load [N/m]
-%-- input 
-
-% Point forces at points [1,2,3,4]*L/4 [N]
-%-- input
 
 % Time discretization parameters
 tend = 5*tPer;              % End time
@@ -204,12 +199,14 @@ end
 
 % Use NN for f
 if (qnn==1)
+    fnw = fullfile('..', 'FFNN_ROM', 'data', 'force.weights.txt');
     units = [16 16 16 16 qm]; % Number of nodes in hidden and output layers
-    activations = {@softplus @softplus @softplus @softplus @linear};
+    activations = {@tanh_act @tanh_act @tanh_act @tanh_act @linear_act};
     [Wnn,bnn] = read_weights(units,fnw);
 elseif (qnn==2)
+    fnw = fullfile('..', 'FFNN_ROM', 'data', 'potential.weights.txt');
     units = [16 16 1]; % Number of nodes in hidden and output layers
-    activations = {@softplus @softplus @linear};
+    activations = {@softplus_act @softplus_act @linear_act};
     [Wnn,bnn] = read_weights(units,fnw);
 end
 
@@ -477,27 +474,37 @@ end
 
 % -------------------------------------------------------------------------
 % --- NEURAL NETWORK ACTIVATION FUNCTIONS
-function [y,dy,ddy] = softplus(x)
-    y = softplus(x);
+function [y,dy,ddy] = softplus_act(x)
+    y = log(1 + exp(x));
     if nargout > 1
-        dy = sigmoid(x);
+        dy = 1 ./ (1 + exp(-x));
         if nargout > 2
-            ddy = dsigmoid(dy);
+            ddy = dy.*(1 - dy);
         end
-    end
-    
-    function y = softplus(x)
-        y = log(1 + exp(x));
-    end
-    function y = sigmoid(x)
-        y = 1 ./ (1 + exp(-x));
-    end
-    function y = dsigmoid(x)
-        y = x.*(1 - x);
     end
 end
 
-function [y,dy,ddy] = linear(x)
+function [y,dy,ddy] = sigmoid_act(x)
+    y = 1 ./ (1 + exp(-x));
+    if nargout > 1
+        dy = y .* (1 - y);
+        if nargout > 2
+            ddy = dy .* (1 - y) - y .* dy;
+        end
+    end
+end
+
+function [y,dy,ddy] = tanh_act(x)
+    y = tanh(x);
+    if nargout > 1
+        dy = 1 - y.^2;
+        if nargout > 2
+            ddy = -2 * y .* dy;
+        end
+    end
+end
+
+function [y,dy,ddy] = linear_act(x)
     y = x;
     if nargout > 1
         dy = x./x;

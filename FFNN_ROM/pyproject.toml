@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "paml_rom"
+version = "25.5"
+description = "Package providing modules for the FFNN ROM task."
+authors = [
+    { name = "Jasper O. Schommartz", email = "schommartz@cps.tu-darmstadt.de"},
+]
+maintainers = [
+    { name = "Jasper O. Schommartz", email = "schommartz@cps.tu-darmstadt.de"},
+]
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = ["matplotlib", "tensorflow", "scikit-learn", "numpy", "pandas"]
+
+[project.urls]
+Repository = "https://github.com/CPSHub/LecturePhysicsAwareML"
+Issues = "https://github.com/CPSHub/LecturePhysicsAwareML/issues"
