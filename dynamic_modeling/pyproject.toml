@@ -1,0 +1,28 @@
+[project]
+name = "dynamic-modeling"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Fabian Roth", email = "roth@cps.tu-darmstadt.de" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "diffrax>=0.7.0",
+    "klax@git+https://github.com/Drenderer/klax@6c16453e573364650045e93a93f1c9d719789d0f",
+    "matplotlib>=3.10.3",
+    "notebook>=6.5.7",
+]
+
+[project.scripts]
+dynamic-modeling = "dynamic_modeling:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.uv.sources]
+klax = { git = "https://github.com/Drenderer/klax", rev = "6c16453e573364650045e93a93f1c9d719789d0f" }
