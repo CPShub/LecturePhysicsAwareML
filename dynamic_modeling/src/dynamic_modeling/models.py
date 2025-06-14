@@ -3,9 +3,9 @@ import jax
 import equinox as eqx
 
 from jaxtyping import PRNGKeyArray, Array
-from typing import Literal
+from typing import Literal, Callable
 
-ACTIVATIONS = dict(
+ACTIVATIONS: dict[str, Callable] = dict(
     softplus=jax.nn.softplus,
     relu=jax.nn.relu,
     sigmoid=jax.nn.sigmoid,

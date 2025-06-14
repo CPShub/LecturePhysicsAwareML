@@ -8,10 +8,18 @@ from IPython.display import HTML
 from jaxtyping import Array
 from typing import Literal
 
+from pathlib import Path
+
 from .._plotting import make_spring
 
+
 def animate_spring_pendulum(
-    ts: Array, qs: Array, fps: int = 30, speedup: int = 3, color=None
+    ts: Array,
+    qs: Array,
+    fps: int = 30,
+    speedup: int = 3,
+    color=None,
+    filename: Path | str | None = None,
 ) -> HTML:
     """Animate one or multiple solutions of the spring pendulum via
     matplotlib in a Jupyter notebook.
@@ -27,6 +35,8 @@ def animate_spring_pendulum(
         speedup: Speedup of the animation. Defaults to 3.
         color: Color of the pendulum bob(s). Defaults to None, which uses blue for the first
             pendulum bob and gray for all others.
+        filename: If a Path or string of a filename is provided, the animation will be saved
+            as a gif file.
 
     Returns:
         HTML display object. When this object is returned by an
@@ -86,6 +96,10 @@ def animate_spring_pendulum(
 
     ani = FuncAnimation(fig, animate, frames=t_frames)  # type: ignore
 
+    if filename is not None:
+        filename = Path(filename)
+        ani.save(filename, fps=fps, dpi=300)
+
     plt.close()
     return HTML(ani.to_jshtml(fps=fps))
 
@@ -102,7 +116,7 @@ def plot_trajectory(
     Args:
         ts: 1D array of monotonically increasing time stamps
             with ``shape=(k,)``.
-        ys: 2D array of ``shape=(k, n)`` containing qx, qy, qx_t, qy_t 
+        ys: 2D array of ``shape=(k, n)`` containing qx, qy, qx_t, qy_t
             along the last axis.
     """
     if ys.ndim != 2 or ys.shape[-1] < 2:
@@ -125,6 +139,7 @@ def plot_trajectory(
     )
     ax.legend()
     return ax
+
 
 def plot_energy(
     ts: Array,
