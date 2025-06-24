@@ -20,7 +20,6 @@ colors = np.array(
 def plot_loss(history):
     fig = plt.figure(1, dpi=600)
     plt.semilogy(history["loss"], color="tab:blue", label="training loss")
-    # plt.semilogy(history['val_loss'], color='tab:blue', linestyle='--', label='validation loss')
     plt.grid(which="both")
     plt.xlabel("calibration epoch")
     plt.ylabel("log$_{10}$ MSE")
