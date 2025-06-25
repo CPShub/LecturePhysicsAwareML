@@ -1,2 +1,1 @@
-def main() -> None:
-    print("Hello from operator-learning!")
+from ._fno import FNO
