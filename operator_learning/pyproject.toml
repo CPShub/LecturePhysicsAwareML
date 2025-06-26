@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
+    "ipywidgets>=8.1.7",
     "klax@git+https://github.com/Drenderer/klax@6c16453e573364650045e93a93f1c9d719789d0f",
     "matplotlib>=3.10.3",
     "notebook>=6.5.7",
