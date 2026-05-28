@@ -6,12 +6,14 @@ readme = "README.md"
 authors = [
     { name = "Fabian Roth", email = "roth@cps.tu-darmstadt.de" }
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
     "diffrax>=0.7.0",
-    "klax@git+https://github.com/Drenderer/klax@6c16453e573364650045e93a93f1c9d719789d0f",
+    "ipywidgets>=8.1.8",
+    "klax==0.2.0",
     "matplotlib>=3.10.3",
     "notebook>=6.5.7",
+    "tqdm>=4.67.3",
 ]
 
 [project.scripts]
@@ -23,6 +25,3 @@ build-backend = "hatchling.build"
 
 [tool.hatch.metadata]
 allow-direct-references = true
-
-[tool.uv.sources]
-klax = { git = "https://github.com/Drenderer/klax", rev = "6c16453e573364650045e93a93f1c9d719789d0f" }
