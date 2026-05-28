@@ -414,7 +414,7 @@ wheels = [
 
 [[package]]
 name = "dynamic-modeling"
-version = "0.1.0"
+version = "2026.5.28"
 source = { editable = "." }
 dependencies = [
     { name = "diffrax" },
