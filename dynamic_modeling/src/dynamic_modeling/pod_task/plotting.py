@@ -3,16 +3,16 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
 
-def plot_simulation_snapshot(time_index, simulation_index, ds, mesh):
-    camera_position = [
+CAMERA_POSITION = [
         (0.03, -0.07, 0.05),  # camera position (x, y, z)
         (0.025, 0.0, 0.0),  # focal point — where the camera looks
         (0.0, 0.0, 1.0),  # view-up vector
     ]
 
+def plot_simulation_snapshot(time_index, simulation_index, ds, mesh):
     t = ds.time[time_index].values
     snapshot = ds.isel(batch=simulation_index, time=time_index)
-
+    
     plotter = pv.Plotter(shape=(1, 2), window_size=(1500, 450), notebook=True)
 
     plotter.subplot(0, 0)
@@ -20,11 +20,12 @@ def plot_simulation_snapshot(time_index, simulation_index, ds, mesh):
     plotter.add_mesh(
         mesh,
         scalars=scalars,
-        cmap="seismic",
+        cmap="plasma",
+        clim=[ds.heat_source.min().values, ds.heat_source.max().values],
         scalar_bar_args={"title": "Heat source [W/m^3]"},
     )
     plotter.add_text(f"Heat source field\nt={t}", font_size=10)
-    plotter.camera_position = camera_position
+    plotter.camera_position = CAMERA_POSITION
 
     plotter.subplot(0, 1)
     scalars = snapshot.temperature.to_numpy()
@@ -32,6 +33,7 @@ def plot_simulation_snapshot(time_index, simulation_index, ds, mesh):
         mesh,
         scalars=scalars,
         cmap="seismic",
+        clim=[ds.temperature.min().values, ds.temperature.max().values],
         scalar_bar_args={"title": "Temperature [K]"},
     )
     plotter.add_text(f"Temperature field\nt={t}", font_size=10)
@@ -69,12 +71,6 @@ def plot_singular_values(snapshots, title=""):
     plt.show()
 
 def plot_modes(modes, mesh):
-    camera_position = [
-        (0.03, -0.07, 0.05),  # camera position (x, y, z)
-        (0.025, 0.0, 0.0),  # focal point — where the camera looks
-        (0.0, 0.0, 1.0),  # view-up vector
-    ]
-
     num_modes = modes.shape[1]
     num_plots = min(16, num_modes)
 
@@ -86,7 +82,7 @@ def plot_modes(modes, mesh):
         plotter.subplot(i // n_col, i % n_col)
         plotter.add_mesh(mesh, scalars=modes[:, i], cmap="seismic")
         plotter.add_text(f"Mode {i}", font_size=10)
-        plotter.camera_position = camera_position
+        plotter.camera_position = CAMERA_POSITION
 
     plotter.link_views()
     plotter.show()
@@ -113,3 +109,34 @@ def plot_latents(latent_heat_source, latent_temperature, batch: int):
     fig.suptitle(f"Simulation {batch}")
     plt.tight_layout()
     plt.show()
+
+
+def plot_reconstruction(time_index, simulation_index, plot_field, ds, ds_reconstructed, mesh):
+    ds_error = np.abs(ds - ds_reconstructed)
+
+    plotter = pv.Plotter(shape=(1, 3), window_size=(1500, 450), notebook=True)
+
+    plotter.subplot(0, 0)
+    scalars = ds.isel(batch=simulation_index, time=time_index)[plot_field].to_numpy()
+    plotter.add_mesh(mesh, scalars=scalars, cmap="seismic")
+    plotter.add_text("Original data", font_size=10)
+    plotter.camera_position = CAMERA_POSITION
+
+    plotter.subplot(0, 1)
+    scalars = ds_reconstructed.isel(
+        batch=simulation_index, time=time_index
+    )[plot_field].to_numpy()
+    plotter.add_mesh(mesh, scalars=scalars, cmap="seismic")
+    plotter.add_text("Reconstruction", font_size=10)
+
+    plotter.subplot(0, 2)
+    scalars = ds_error.isel(
+        batch=simulation_index, time=time_index
+    )[plot_field].to_numpy()
+    plotter.add_mesh(
+        mesh, scalars=scalars, cmap="hot", scalar_bar_args={"title": "Error"}
+    )
+    plotter.add_text("Error", font_size=10)
+
+    plotter.link_views()
+    plotter.show()
