@@ -1,3 +1,6 @@
+# Data
+PAML_DED_Dataset/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

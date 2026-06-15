@@ -9,11 +9,15 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "diffrax>=0.7.0",
-    "ipywidgets==7.7.1",    # Version fix is required to make tqdm work in colab (28.05.2026)
+    "h5netcdf>=1.8.1",
+    "h5py>=3.16.0",
+    "ipywidgets==7.7.1", # Version fix is required to make tqdm work in colab (28.05.2026)
     "klax==0.2.0",
     "matplotlib>=3.10.3",
     "notebook>=6.5.7",
+    "pyvista[jupyter]>=0.48.4",
     "tqdm>=4.67.3",
+    "xarray>=2026.4.0",
 ]
 
 [project.scripts]
