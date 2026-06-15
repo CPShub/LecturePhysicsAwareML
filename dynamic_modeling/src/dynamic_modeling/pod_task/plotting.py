@@ -4,15 +4,16 @@ from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
 
 CAMERA_POSITION = [
-        (0.03, -0.07, 0.05),  # camera position (x, y, z)
-        (0.025, 0.0, 0.0),  # focal point — where the camera looks
-        (0.0, 0.0, 1.0),  # view-up vector
-    ]
+    (0.03, -0.07, 0.05),  # camera position (x, y, z)
+    (0.025, 0.0, 0.0),  # focal point — where the camera looks
+    (0.0, 0.0, 1.0),  # view-up vector
+]
+
 
 def plot_simulation_snapshot(time_index, simulation_index, ds, mesh):
     t = ds.time[time_index].values
     snapshot = ds.isel(batch=simulation_index, time=time_index)
-    
+
     plotter = pv.Plotter(shape=(1, 2), window_size=(1500, 450), notebook=True)
 
     plotter.subplot(0, 0)
@@ -70,13 +71,16 @@ def plot_singular_values(snapshots, title=""):
     plt.tight_layout()
     plt.show()
 
+
 def plot_modes(modes, mesh):
     num_modes = modes.shape[1]
     num_plots = min(16, num_modes)
 
     n_row = int(np.ceil(num_plots / 4))
     n_col = min(num_plots, 4)
-    plotter = pv.Plotter(shape=(n_row, n_col), window_size=(500 * n_col, 300 * n_row), notebook=True)
+    plotter = pv.Plotter(
+        shape=(n_row, n_col), window_size=(500 * n_col, 300 * n_row), notebook=True
+    )
 
     for i in range(num_plots):
         plotter.subplot(i // n_col, i % n_col)
@@ -86,6 +90,7 @@ def plot_modes(modes, mesh):
 
     plotter.link_views()
     plotter.show()
+
 
 def plot_latents(latent_heat_source, latent_temperature, batch: int):
     fig, axes = plt.subplots(1, 2, figsize=(15, 4))
@@ -111,30 +116,49 @@ def plot_latents(latent_heat_source, latent_temperature, batch: int):
     plt.show()
 
 
-def plot_reconstruction(time_index, simulation_index, plot_field, ds, ds_reconstructed, mesh):
+def plot_reconstruction(
+    time_index, simulation_index, plot_field, ds, ds_reconstructed, mesh
+):
     ds_error = np.abs(ds - ds_reconstructed)
 
     plotter = pv.Plotter(shape=(1, 3), window_size=(1500, 450), notebook=True)
 
     plotter.subplot(0, 0)
     scalars = ds.isel(batch=simulation_index, time=time_index)[plot_field].to_numpy()
-    plotter.add_mesh(mesh, scalars=scalars, cmap="seismic")
+    plotter.add_mesh(
+        mesh,
+        scalars=scalars,
+        cmap="seismic",
+        scalar_bar_args={
+            "n_labels": 3,
+            "position_x": 0.2,
+            "width": 0.6,
+        },
+    )
     plotter.add_text("Original data", font_size=10)
     plotter.camera_position = CAMERA_POSITION
 
     plotter.subplot(0, 1)
-    scalars = ds_reconstructed.isel(
-        batch=simulation_index, time=time_index
-    )[plot_field].to_numpy()
+    scalars = ds_reconstructed.isel(batch=simulation_index, time=time_index)[
+        plot_field
+    ].to_numpy()
     plotter.add_mesh(mesh, scalars=scalars, cmap="seismic")
     plotter.add_text("Reconstruction", font_size=10)
 
     plotter.subplot(0, 2)
-    scalars = ds_error.isel(
-        batch=simulation_index, time=time_index
-    )[plot_field].to_numpy()
+    scalars = ds_error.isel(batch=simulation_index, time=time_index)[
+        plot_field
+    ].to_numpy()
     plotter.add_mesh(
-        mesh, scalars=scalars, cmap="hot", scalar_bar_args={"title": "Error"}
+        mesh,
+        scalars=scalars,
+        cmap="hot",
+        scalar_bar_args={
+            "title": "Error",
+            "n_labels": 3,
+            "position_x": 0.2,
+            "width": 0.6,
+        },
     )
     plotter.add_text("Error", font_size=10)
 
