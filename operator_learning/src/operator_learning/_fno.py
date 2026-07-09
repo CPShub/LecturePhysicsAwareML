@@ -94,7 +94,7 @@ class FNOLayer(eqx.Module):
 
     def __call__(self, x: Array):
         return self.activation(
-            self.spectral_conv(x)  # + jax.vmap(self.linear)(x)
+            self.spectral_conv(x) + jax.vmap(self.linear)(x)
         )
 
 
